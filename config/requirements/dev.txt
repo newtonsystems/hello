@@ -1,0 +1,9 @@
+-r base.txt
+-e git+https://github.com/javaab/libutils.git#egg=libutils
+
+# docs supports
+# ====================
+sphinx
+recommonmark
+sphinx-git
+sphinx_rtd_theme

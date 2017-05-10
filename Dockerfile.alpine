@@ -1,0 +1,64 @@
+#
+# A Docker Image for a gRPC python micorservice
+#
+#
+# Please README.md for how to run this Docker Container
+#
+#
+#  
+
+# Our aim to make this image as small as possible
+
+# We use alpine over Debian as its only 5MB
+FROM python:2.7.13-alpine
+MAINTAINER James Tarball <james.tarball@newtonsystems.co.uk>
+
+# Add Label Badges to Dockerfile powered by microbadger
+ARG VCS_REF
+
+LABEL org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="e.g. https://github.com/microscaling/microscaling"
+
+
+
+ARG ENV_TYPE prod
+
+ENV APP_DIR /app
+ENV BUILD_DIR /tmp
+ENV PYTHON_PACKAGE_LOCATION /usr/local/src
+ENV DEVPI_INDEX_URL http://devpi.tetherboxapp.com:3141/newtonsystems/master
+
+
+
+RUN apk add --update --virtual .build-deps \
+        git \
+    && rm -rf /var/cache/apk/*
+
+
+
+#RUN if [ "$ENV_TYPE" = "dev" ]; then \
+#		sudo pip install -e ".[testing]"; \
+		
+#	fi 
+
+
+
+# 1. Copy pip requirements to BUILD_DIR
+# 2. 
+#   - Install requirements based on environment type (development / production etc)
+#   - Install with:
+#       - wheelhouse support (for fast caching)
+#       - set index to branch specific netwonsystems index
+COPY config/requirements $BUILD_DIR/requirements
+
+RUN sudo pip install --index $DEVPI_INDEX_URL --find-links=$BUILD_DIR/wheelhouse -r $BUILD_DIR/requirements/$ENV_TYPE.txt --src $PYTHON_PACKAGE_LOCATION
+
+# might need to use --extra-index-url
+
+# Definite entrypoint
+COPY config/docker-entrypoint.sh /entrypoint.sh
+RUN sudo chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+
+CMD ["app"]

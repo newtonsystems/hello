@@ -1,0 +1,47 @@
+# Docker Compose YML Config
+
+# This is the Production Config (Docker Compose v1.6.0 up)
+
+
+version: '2'
+services:
+    app:
+      extends:
+        file: docker-compose-common.yml
+        service: app
+      build: 
+        context: docker/app
+        args:
+          - ENV_TYPE=prod
+      env_file:
+        - .env-prod
+
+    redis:
+      extends:
+        file: docker-compose-common.yml
+        service: redis
+      ports:
+        - "6379"
+
+    postgres:
+      extends:
+        file: docker-compose-common.yml
+        service: postgres
+      expose:
+        - "5432" 
+      env_file:
+        - .env-prod
+
+    rabbitmq:
+      extends:
+        file: docker-compose-common.yml
+        service: rabbitmq
+      env_file:
+        - .env-prod
+
+    nginx:
+      extends:
+        file: docker-compose-common.yml
+        service: nginx
+      env_file:
+        - .env-prod

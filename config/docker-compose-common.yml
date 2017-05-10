@@ -1,0 +1,42 @@
+# Docker Compose YML Common Config 
+
+# This is the Common Config (Docker Compose v1.6.0 up)
+# This could not be run directly (should be extended)
+
+version: '2'
+services:
+  app:
+    restart: always
+    build: 
+      context: ./
+    ports:
+      - "8000:8000"
+      - "3000:3000"
+      - "3001:3001"
+      - "5555:5555"
+      - "6543:6543"
+
+  redis:
+    restart: always
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  postgres:
+    restart: always
+    image: postgres:latest
+    #volumes:
+    #   - /var/lib/postgresql
+
+
+  rabbitmq:
+    restart: always
+    image: rabbitmq:latest
+    ports:
+      - "5672:5672"
+
+  nginx:
+    restart: always
+    build: ../nginx/
+    ports:
+      - "80:80"

@@ -1,0 +1,60 @@
+# Docker Compose YML Config
+
+# This is the Test Config (Docker Compose v1.6.0 up)
+
+
+version: '2'
+services:
+    app:
+      extends:
+        file: docker-compose-common.yml
+        service: app
+      build: 
+        context: ../
+        args:
+          - ENV_TYPE=test
+      volumes:
+        - ./app/circle-junit:/circle-junit
+      links:
+        - postgres:postgres
+        - redis:redis
+        - rabbitmq:rabbitmq
+      depends_on:
+        - postgres
+        - redis
+        - rabbitmq
+      env_file:
+        - ./env-test
+
+    redis:
+      extends:
+        file: docker-compose-common.yml
+        service: redis
+      env_file:
+        - ./env-test
+
+    postgres:
+      extends:
+        file: docker-compose-common.yml
+        service: postgres
+      env_file:
+        - ./env-test
+
+    rabbitmq:
+      extends:
+        file: docker-compose-common.yml
+        service: rabbitmq
+      env_file:
+        - ./env-test
+
+    nginx:
+      extends:
+        file: docker-compose-common.yml
+        service: nginx
+      links:
+        - app:app
+      volumes_from:
+        - app
+      env_file:
+        - ./env-test
+
