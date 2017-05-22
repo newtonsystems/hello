@@ -1,6 +1,10 @@
 NAME=app
 PACKAGE_NAME=javaab_auth
 
+SERVICE_PORT=4141
+
+CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
+
 # #Calls to docker-env
 #DEPS=
 
@@ -143,6 +147,18 @@ define error_message
     echo "$(ERROR)$(RED)$(1)$(NO_COLOR)"
 endef
 
+# set username and password
+UNAME="jtarball"
+UPASS="mirage27"
+
+ifdef docker_tag_exists
+    TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'${UNAME}'", "password": "'${UPASS}'"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
+    EXISTS=$(curl -s -H "Authorization: JWT ${TOKEN}" https://hub.docker.com/v2/repositories/$1/tags/?page_size=10000 | jq -r "[.results | .[] | .name == \"$2\"] | any")
+    test $EXISTS = true
+endif
+
+# $(call error_message,  "Failed to receive a "'pong'" response. It looks like linkerd is not running..."); \
+
 
 
 .PHONY: local mount create delete
@@ -167,6 +183,7 @@ LINKERVIZ_PORT=`kubectl get svc linkerd-viz -o jsonpath='{.spec.ports[?(@.name==
 
 LINKERD_INGRESS_LB=http://`minikube ip`:$(INCOMING_PORT)
 LINKERD_EGRESS_LB=http://`minikube ip`:$(OUTGOING_PORT)
+LINKERD_ADMIN=http://`minikube ip`:$(ADMIN_PORT)
 
 MINIKUBE_IP=`minikube ip`
 PING_ADMIN=http://`minikube ip`:$(ADMIN_PORT)/admin/ping
@@ -204,7 +221,13 @@ describe-local-category: ##@other Describes the 'local' category and what it is 
 	@echo "sahkjdhka"
 
 help-show-normal-usage:      ##@other Shows normal usage case for development (what commands to run)
-	@echo "dsfk"
+	@echo "${GREEN}The normal usage is the following for working locally:${RESET}"
+	@echo "${YELLOW}\tPREREQUISTIC: Make sure minikube is running 'minikube start'${RESET}"
+	@echo "\t1) If you want to run the services locally:"
+	@echo "\tYou need to create the infrastructure services (linkerd etc)"
+	@echo "${YELLOW}\t\tinfra-create${RESET}"
+	@echo "${YELLOW}\t\tinfra-create${RESET}"
+
 
 help-quick-start:
 	@echo "dsjfk"
@@ -217,7 +240,15 @@ help-how-to:
 	@echo "How to run all services except this one via minikube"
 
 
-kube-clean:                       ##@cleanup Clean Up Environment. Deletes all kubernetes components
+help-common-troubleshooting:
+	@echo "${RED} Heapster UI not available:${RESET} Waiting, endpoint for service is not ready yet..."
+	@echo "1.) Check heapster service is running: ${GREEN}kubectl get services --namespace=kube-system${RESET}"
+	@echo "2.) Restart heapster service: ${GREEN}kubectl delete service --namespace=kube-system heapster${RESET}"
+	@echo "3.) Disable and then enable heapster addon: ${GREEN}minikube addons disable heapster; minikube addons enable heapster;${RESET}"
+
+
+
+kube-clean:                       ##@cleanup Cleans Up Kubernetes Environment. Deletes all kubernetes components
 	kubectl delete deployment --all
 	kubectl delete daemonset --all
 	kubectl delete replicationcontroller --all
@@ -228,41 +259,55 @@ kube-clean:                       ##@cleanup Clean Up Environment. Deletes all k
 #
 # Infrastructure
 #
-
 infra-recreate:              ##@infrastructure Recreate all critical infrastructure components in minikube to run with your service
 	@echo "$(INFO) Re-creating Infrastructure Components"
 	make infra-delete
 	make infra-create
 
-infra-create:                ##@infrastructure Creates all critical infrastructure components (via minikube/k8s)
+infra-create:                ##@infrastructure Creates all critical infrastructure components (via minikube/k8s (ensure running))
 	@echo "$(INFO) Creating Infrastructure Components"
 	kubectl apply -f ../devops/k8s/deploy/local/
 
-infra-delete:                ##@infrastructure Deletes all critical instructure components (via minikube/k8s)
+infra-delete:                ##@infrastructure Deletes all critical instructure components (via minikube/k8s (ensure ))
 	@echo "$(INFO) Deleting Infrastructure Components"
 	kubectl delete -f ../devops/k8s/deploy/local/
 
 #
 # Infrastructure helper commands
 #
+infra-ui:                    ##@infrastructure-helper-commands Open all infrastructure's UIs. Perfect for monitoring, debugging and tracing microservices.
+	@echo "$(INFO) Opening minikube dashboard (Kubernetes dashboard)"
+	@minikube dashboard
+	@echo "$(INFO) Opening linkerd 's admin page ..."
+	@minikube service linkerd --url | tail -n1 | xargs open
+	@echo "$(INFO) Opening linkerd viz ..."
+	@open http://`minikube ip`:$(LINKERVIZ_PORT)
+	@echo "$(INFO) Opening zipkin (distributed tracing)"
+	@minikube service zipkin
+	@echo "$(WARN) Not going to open minikube addon heapster. Heapster not currently working with minikube 0.19 (works with 0.18) (21/5/17)"
+# @echo "$(INFO) Opening Heapster - Resource Usage Analysis and Monitoring"
+# @open `minikube service monitoring-grafana --namespace=kube-system  --url`
 
 infra-linkerd-ping:          ##@infrastructure-helper-commands Pings linkerd's admin. A useful way to see if linkerd is up and running.
-	@echo "$(INFO) Pinging Linkerd Admin Interface. You should receive a message 'pong'"
+	@printf "$(GREEN) Pinging Linkerd Admin Interface ... $(RESET)"
 	@if [ '$(shell curl $(PING_ADMIN))' != 'pong' ]; then \
-		$(call error_message,  "Failed to receive a "'pong'" response. It looks like linkerd is not running..."); \
+		echo "$(RED)Failed to receive a "'pong'" response. It looks like linkerd is not running...$(RESET)"; \
 		exit 1; \
+	else \
+		echo "$(GREEN)Successful ping.$(RESET)"; \
 	fi
-
-infra-ui:                    ##@infrastructure-helper-commands Open all infrastructure's user interfaces. Perfect for monitoring, debugging and tracing microservices. (linkerd admin, linker-viz, zipkin, prometheus)
-	@echo ""
-
 
 
 #
 # Build Service Locally
 #
+.PHONY: build build-dev run run-dev latest daemon clean check
 
-DOCKER_RUN_COMMAND=docker run --rm -t \
+DOCKER_RUN_COMMAND=docker run \
+	-e "L5D_PORT_4141_TCP=$(SERVICE_PORT)" \
+	-p 50000:50000
+
+DOCKER_RUN_LOCAL_COMMAND=docker run --rm -t \
 	-p 50000:50000 \
 	-v ${PWD}/app:/app \
 	-v ${PWD}../../libutils:/usr/local/src/libutils \
@@ -273,26 +318,43 @@ build:                       ##@local Builds the local Dockerfile
 	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
 	@docker image build -t $(REPO):local -f Dockerfile .
 
-
 build-dev:                   ##@local Builds the local Dockerfile.dev (Development Dockerfile (Not run in production)). Useful if you need to debug a container (Installs helpful tools)
 	@echo "$(WARN) Building the Container locally with tag: $(REPO):local using Development Dockerfile (Do not run unless you need to and know what you are doing)"
 	@docker image build -t $(REPO):local -f Dockerfile.dev .
 
-
 run: build                   ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off
 	@echo "$(INFO) Running docker container with tag: $(REPO):local"
-	$(DOCKER_RUN_COMMAND) $(REPO):local app
-
+	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
 
 run-dev: build-dev           ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off based of Dockerfile.dev (Development Debug Only)
-	@echo "$(WARN) Running docker container with tag: $(REPO):local (USING Dockerfile.dev)"
+	@echo "$(WARN) Running docker container with tag: $(REPO):local (USING Dockerfile.dev) (ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING)"
+	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
+
+latest: 
+	@echo "$(INFO) Running the most up-to-date image"
+
+	#@if [[ $$CONTINUE != "y" ]]; then \
+	#	read -r -p "$(GREEN)Select your own image. [y/N] $(RESET)" reply; \
+	#	echo $$reply \
+	#	echo "You pressed yes"; \
+	#else \
+	#	echo " NO"; \
+	#fi
+	docker pull newtonsystems/$(REPO):master
 	$(DOCKER_RUN_COMMAND) $(REPO):local app
 
+TOKEN=`curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'jtarball'", "password": "'mirage27'"}' https://hub.docker.com/v2/users/login/ | python -c "import sys, json; print json.load(sys.stdin)['token']"`
 
-run-latest: 
-	@echo "dsf"
-	docker pull
-	docker run 
+TAG_EXISTS=`curl -s -H "Authorization: JWT ${TOKEN}" https://hub.docker.com/v2/repositories/$(REPO)/tags/?page_size=10000"`
+# | jq -r "[.results | .[] | .name == \"$(CURRENT_BRANCH)\"] | any"`
+
+test-tag:
+	echo $(TAG_EXISTS)
+	@if [[ "$(call docker_tag_exists, "jtarball/hello", "local")" == 'true' ]]; then \
+		echo "YES"; \
+	else \
+		echo " NO"; \
+	fi
 
 
 daemon:
@@ -300,20 +362,24 @@ daemon:
 	$(DOCKER_RUN_COMMAND) -d $(REPO):local app
 
 
-latest:
-	@echo "fdsf"
-	PULL_IMAGE=master
-	docker pull newtonsystems/$(REPO):$(PULL_IMAGE)
+#latest:
+#	@echo "fdsf"
+#	PULL_IMAGE=master
+#	docker pull newtonsystems/$(REPO):$(PULL_IMAGE)
 
 
-clean:                ##@local Removes all docker processes, containers and images for '$(REPO):local'
-	@echo "$(INFO) Cleaning all docker processes, containers and images for $(REPO):local"
+stop:
 	@if [ -n "`docker ps -q -f ancestor=$(REPO):local`" ]; then \
-		echo "$(INFO) Stopping docker processes with tag: 'hello:local'"; \
+		echo "$(INFO) Stopping all docker processes with tag: 'hello:local'"; \
 		docker stop `docker ps -q -f ancestor=$(REPO):local`; \
 	else \
 		$(call warn_message,  "No docker processes with image name "'"$(REPO):local"'" found to stop."); \
 	fi
+
+
+clean:                ##@local Removes all docker processes, containers and images for '$(REPO):local'
+	@echo "$(INFO) Cleaning all docker processes, containers and images for $(REPO):local"
+	make stop
 
 	@if [ -n "`docker ps -q -f ancestor=$(REPO):local`" ]; then \
 		echo "$(INFO) Removing docker containers with tag: 'hello:local'"; \
@@ -336,12 +402,14 @@ clean:                ##@local Removes all docker processes, containers and imag
 
 shell:
 	@echo ""
+	docker exec -it $(docker ps -lq --filter="status=running" --filter="status=restarting"
 
 
 check:                 ##@local Run regression tests against the dockerized service (Run before commit/merge - don't break regression)
 	@echo "$(INFO) Running some tests inside the container"
 
-
+lint:
+	@echo "fdjhsjkf"
 
 
 

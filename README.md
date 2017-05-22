@@ -41,6 +41,8 @@ pg_ctl -D /usr/local/var/postgres stop -s -m fast
 
 
 
+TODO:
+- research prometheus and grafana to set up some useful alerting / graphing when in local development
 
 
 
@@ -49,6 +51,62 @@ pg_ctl -D /usr/local/var/postgres stop -s -m fast
 
 
 
+USAGES
+--------
+
+
+DEBUG MODE
+-----------
+We have a useful mode for debugging docker containers. This is especially useful if you need to ssh into the container.
+
+- This mode uses `Dockerfile.dev`
+- Dockerfile.dev calls debug.txt from config/requirements which will include useful debugging python packages
+
+```sh
+make build-dev
+make run
+
+
+If you have docker-utils in your path you can then ssh into the most recent container 
+```
+docker-into-most-recent-container
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+new repo
+----------
+- need to create a repo in dokcer hub
+- need to create collabraotr
+- need to pull i think first
+- then can login and push 
 
 
 

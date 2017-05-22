@@ -1,0 +1,4 @@
+-r dev.txt
+
+# Extra Python Packages useful for debugging
+ipython
