@@ -23,8 +23,8 @@ LABEL org.label-schema.vcs-ref=$VCS_REF \
       org.label-schema.vcs-url="e.g. https://github.com/microscaling/microscaling"
 
 
-
-ENV ENV_TYPE prod
+ARG APP_ENV=prod
+ENV ENV_TYPE ${APP_ENV}
 
 ENV APP_DIR /app
 ENV BUILD_DIR /tmp
@@ -87,6 +87,9 @@ RUN pip install --use-wheel -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
 
 # Add Label Badges to Dockerfile powered by microbadger
 COPY app /app
+
+# Add all useful scripts to bin path
+COPY config/bin /usr/local/bin/
 
 EXPOSE 50000
 ENV TERM=xterm

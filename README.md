@@ -111,3 +111,14 @@ new repo
 
 
 
+
+
+
+
+
+TODO
+-----
+- Deploy via wheelhouse and setup.py !!
+- docs that work and take stuff from the ptyhon code -> swagger maybe
+- protos to docs??
+- write a pylint specifically for protobuf

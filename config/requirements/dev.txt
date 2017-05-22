@@ -1,9 +1,15 @@
 -r base.txt
 -e git+https://github.com/javaab/libutils.git#egg=libutils
 
+# Include all packages useful for testing and debug
+
 # docs supports
 # ====================
 sphinx
 recommonmark
 sphinx-git
 sphinx_rtd_theme
+
+pylint
+nose
+coverage

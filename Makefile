@@ -1,3 +1,9 @@
+#
+# Makefile version 
+# created by cookiecutter blah
+#
+
+
 NAME=app
 PACKAGE_NAME=javaab_auth
 
@@ -248,7 +254,7 @@ help-common-troubleshooting:
 
 
 
-kube-clean:                       ##@cleanup Cleans Up Kubernetes Environment. Deletes all kubernetes components
+kube-clean:                       ##@cleanup Cleans Up Kubernetes Environment. Deletes all kubernetes components (services, pods, config, deployments ... etc)
 	kubectl delete deployment --all
 	kubectl delete daemonset --all
 	kubectl delete replicationcontroller --all
@@ -259,16 +265,20 @@ kube-clean:                       ##@cleanup Cleans Up Kubernetes Environment. D
 #
 # Infrastructure
 #
-infra-recreate:              ##@infrastructure Recreate all critical infrastructure components in minikube to run with your service
+infra-recreate:              ##@infrastructure Recreates all critical infrastructure components to run with your service (via minikube/k8s)
 	@echo "$(INFO) Re-creating Infrastructure Components"
 	make infra-delete
 	make infra-create
 
-infra-create:                ##@infrastructure Creates all critical infrastructure components (via minikube/k8s (ensure running))
+infra-create:                ##@infrastructure Creates all critical infrastructure components (via minikube/k8s)
+	@if [ '$(shell minikube status | grep minikubeVM)' != 'minikubeVM: Running' ]; then \
+		echo "$(ERROR) Minikube is not running. Please run 'minikube start'."; \
+		exit 1; \
+	fi
 	@echo "$(INFO) Creating Infrastructure Components"
 	kubectl apply -f ../devops/k8s/deploy/local/
 
-infra-delete:                ##@infrastructure Deletes all critical instructure components (via minikube/k8s (ensure ))
+infra-delete:                ##@infrastructure Deletes all critical instructure components (via minikube/k8s)
 	@echo "$(INFO) Deleting Infrastructure Components"
 	kubectl delete -f ../devops/k8s/deploy/local/
 
@@ -299,270 +309,17 @@ infra-linkerd-ping:          ##@infrastructure-helper-commands Pings linkerd's a
 
 
 #
-# Build Service Locally
+# Build Service Locally + Deploy locally to Minikube
 #
-.PHONY: build build-dev run run-dev latest daemon clean check
+.PHONY: local-kube-recreate local-kube-create local-kube-delete local-kube-update
 
-DOCKER_RUN_COMMAND=docker run \
-	-e "L5D_PORT_4141_TCP=$(SERVICE_PORT)" \
-	-p 50000:50000
-
-DOCKER_RUN_LOCAL_COMMAND=docker run --rm -t \
-	-p 50000:50000 \
-	-v ${PWD}/app:/app \
-	-v ${PWD}../../libutils:/usr/local/src/libutils \
-	-v ${PWD}./wheelhouse:/wheelhouse
-
-
-build:                       ##@local Builds the local Dockerfile 
-	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
-	@docker image build -t $(REPO):local -f Dockerfile .
-
-build-dev:                   ##@local Builds the local Dockerfile.dev (Development Dockerfile (Not run in production)). Useful if you need to debug a container (Installs helpful tools)
-	@echo "$(WARN) Building the Container locally with tag: $(REPO):local using Development Dockerfile (Do not run unless you need to and know what you are doing)"
-	@docker image build -t $(REPO):local -f Dockerfile.dev .
-
-run: build                   ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off
-	@echo "$(INFO) Running docker container with tag: $(REPO):local"
-	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
-
-run-dev: build-dev           ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off based of Dockerfile.dev (Development Debug Only)
-	@echo "$(WARN) Running docker container with tag: $(REPO):local (USING Dockerfile.dev) (ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING)"
-	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
-
-latest: 
-	@echo "$(INFO) Running the most up-to-date image"
-
-	#@if [[ $$CONTINUE != "y" ]]; then \
-	#	read -r -p "$(GREEN)Select your own image. [y/N] $(RESET)" reply; \
-	#	echo $$reply \
-	#	echo "You pressed yes"; \
-	#else \
-	#	echo " NO"; \
-	#fi
-	docker pull newtonsystems/$(REPO):master
-	$(DOCKER_RUN_COMMAND) $(REPO):local app
-
-TOKEN=`curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'jtarball'", "password": "'mirage27'"}' https://hub.docker.com/v2/users/login/ | python -c "import sys, json; print json.load(sys.stdin)['token']"`
-
-TAG_EXISTS=`curl -s -H "Authorization: JWT ${TOKEN}" https://hub.docker.com/v2/repositories/$(REPO)/tags/?page_size=10000"`
-# | jq -r "[.results | .[] | .name == \"$(CURRENT_BRANCH)\"] | any"`
-
-test-tag:
-	echo $(TAG_EXISTS)
-	@if [[ "$(call docker_tag_exists, "jtarball/hello", "local")" == 'true' ]]; then \
-		echo "YES"; \
-	else \
-		echo " NO"; \
-	fi
-
-
-daemon:
-	@echo "$(INFO) Running docker container with tag: $(REPO):local as a daemon ..."
-	$(DOCKER_RUN_COMMAND) -d $(REPO):local app
-
-
-#latest:
-#	@echo "fdsf"
-#	PULL_IMAGE=master
-#	docker pull newtonsystems/$(REPO):$(PULL_IMAGE)
-
-
-stop:
-	@if [ -n "`docker ps -q -f ancestor=$(REPO):local`" ]; then \
-		echo "$(INFO) Stopping all docker processes with tag: 'hello:local'"; \
-		docker stop `docker ps -q -f ancestor=$(REPO):local`; \
-	else \
-		$(call warn_message,  "No docker processes with image name "'"$(REPO):local"'" found to stop."); \
-	fi
-
-
-clean:                ##@local Removes all docker processes, containers and images for '$(REPO):local'
-	@echo "$(INFO) Cleaning all docker processes, containers and images for $(REPO):local"
-	make stop
-
-	@if [ -n "`docker ps -q -f ancestor=$(REPO):local`" ]; then \
-		echo "$(INFO) Removing docker containers with tag: 'hello:local'"; \
-		docker rm `docker ps -q -f ancestor=$(REPO):local`; \
-	else \
-		$(call warn_message,  "No docker container with image name "'"$(REPO):local"'" found to remove."); \
-	fi
-
-	@if [ -n "`docker images hello:local -q`" ]; then \
-		echo "$(INFO) Removing docker images with tag: 'hello:local'"; \
-		docker rmi `docker images hello:local -q`; \
-	else \
-		$(call warn_message,  "No docker container with image name "'"$(REPO):local"'" found to remove."); \
-	fi
-
-
-
-
-
-
-shell:
-	@echo ""
-	docker exec -it $(docker ps -lq --filter="status=running" --filter="status=restarting"
-
-
-check:                 ##@local Run regression tests against the dockerized service (Run before commit/merge - don't break regression)
-	@echo "$(INFO) Running some tests inside the container"
-
-lint:
-	@echo "fdjhsjkf"
-
-
-
-
-
-
-# (connect to minikube as an external service)
-# local  (build + run)
-# local-build - docker build
-# local-run   - docker run 
-# local-daemon
-# local-lint
-# local-run-latest (latest for branch if exists or can set with a value)
-# local-check        (run tests in docker)
-# local-shell
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ok if not started 
-# need external links
-# we not started linkerd and namerd (from a docker-compose)
-
-
-
-
-
-
-
-
-# ONLY SUPPORT ONE REPLICATION (ONE INSTANCE!!! )
-# AT THE MOMENT 
-
-
-
-
-
-# local-infra:
-# 	#TODO: If already created THIS WILL EXPLODE
-# 	kubectl create namespace infra
-
-
-
-local-ui:
-	minikube service l5d --url | tail -n1 | xargs open # on OS X
-	@echo "$(INFO) Opening zipkin (distributed tracing)"
-	minikube service zipkin
-	#@echo "$(INFO) Opening minikube dashboard (Kubernetes dashboard)"
-	#@minikube dashboard
-	#@echo "$(INFO) Opening Heapster - Resource Usage Analysis and Monitoring"
-	#@open `minikube service monitoring-grafana --namespace=kube-system  --url`
-
-
-local-create-infra:
-	kubectl create -f ../devops/deploy/local/
-
-local-apply-infra:
-	kubectl apply -f ../devops/deploy/local/
-
-
-local-infra-create-linkerd:
-	kubectl create -f ../devops/k8s/deploy/local/linkerd.yml
-
-local-infra-apply-linkerd:
-	kubectl apply -f ../devops/k8s/deploy/local/linkerd.yml
-
-local-get-pods:
-	kubectl get pods -o wide
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-local-clean:
-	kubectl delete deployment --all
-	kubectl delete daemonset --all
-	kubectl delete replicationcontroller --all
-	kubectl delete services --all
-	kubectl delete pods --all
-	kubectl delete configmap --all
-
-
-local-infra-dashboard:
-	@echo "$(INFO) Opening Dashboard for Linkerd Admin"
-	@open http://`minikube ip`:$(ADMIN_PORT)
-	@echo "$(INFO) Opening Dashboard for Linkerd Viz Admin"
-	@open http://`minikube ip`:$(LINKERVIZ_PORT)
-
-
-
-
-
-local-hello:
-	@echo "$(INFO) Hello World test"
-	@http_proxy=$(LINKERD_INGRESS_LB) curl -s http://hello
-
-
-local-world:
-	@echo "$(INFO) Hello World test"
-	@http_proxy=$(LINKERD_INGRESS_LB) curl -s http://world
-
-
-
-local:
+kube-local-update:           ##@kube-local
 	@eval $$(minikube docker-env) ;\
 	docker image build -t $(REPO):$(TIMESTAMP) -f Dockerfile .
-	@echo "$(INFO) Deploying $(REPO):$(TIMESTAMP)"
-	kubectl set image -f k8s/deploy/deployment.yaml hello=$(REPO):$(TIMESTAMP)
+	@echo "$(INFO) Deploying $(REPO):$(TIMESTAMP) by replacing image in kubernetes deployment config"
+	kubectl set image -f k8s/deploy/deployment.yaml $(PROJECT_NAME)=$(REPO):$(TIMESTAMP)
 
-
-# local-run:
-# 	@echo "$(INFO) Running Container with tag: local"
-# 	docker run --rm -t \
-# 		-p 50000:50000 \
-# 		-v ${PWD}/app:/app \
-# 		-v ${PWD}../../libutils:/usr/local/src/libutils \
-# 		-v ${PWD}./wheelhouse:/wheelhouse \
-# 		local app
-
-
-
-
-
-
-
-# TODO: Do something better using regex or sed/awk Or develop newtonctl cli
-create:
+kube-local-create:           ##@kube-local
 	@if [ '$(shell minikube status | grep minikubeVM)' != 'minikubeVM: Running' ]; then \
 		echo "$(ERROR) Minikube is not running. Please run 'minikube start'."; \
 		exit 1; \
@@ -572,33 +329,135 @@ create:
 	docker image build -t $(REPO):create -f Dockerfile .
 	kubectl create -f k8s/deploy/
 
-recreate:
-	make delete
-	make create
-
-recreate-linkerd:
-	make delete-linkerd
-	make create-linkerd
-
-
-delete-linkerd:
-	kubectl delete -f ../devops/k8s/deploy/local/linkerd.yml
-
-create-linkerd:
-	kubectl apply -f ../devops/k8s/deploy/local/linkerd.yml
-
-
-delete:
+kube-local-delete:           ##@kube-local
+	@echo "$(INFO) Deleting Service Components from minikube"
 	kubectl delete -f k8s/deploy/
 
-local-dashboard:
-	@echo "$(INFO) Opening minikube dashboard (Kubernetes dashboard)"
-	@minikube dashboard
-	@echo "$(INFO) Opening Heapster - Resource Usage Analysis and Monitoring"
-	@open `minikube service monitoring-grafana --namespace=kube-system  --url`
+kube-local-recreate: kube-local-delete kube-local-create   ##@kube-local
+	@echo "$(INFO) Recreating Service Components from minikube"
 
-local-curl:
-	curl $(minikube service hello --url)
+
+
+
+
+
+
+#
+# Build Service Locally + Run locally
+#
+.PHONY: latest run run-dev daemon build build-dev stop clean check lint
+
+DOCKER_RUN_COMMAND=docker run \
+	-e "L5D_PORT_4141_TCP=$(SERVICE_PORT)" \
+	-p 50000:50000 \
+	--name $(REPO)_local
+
+DOCKER_RUN_LOCAL_COMMAND=docker run --rm -t \
+	-p 50000:50000 \
+	-e "L5D_PORT_4141_TCP=$(SERVICE_PORT)" \
+	--name $(REPO)_local \
+	-v ${PWD}/app:/app \
+	#-v ${PWD}../../libutils:/usr/local/src/libutils \
+	-v ${PWD}./wheelhouse:/wheelhouse
+
+
+latest:                      ##@local Run the most up-to-date image for your branch from the docker registry or if the image doesnt exist yet you can specify. (When you want to run as service as a black-box)
+	@echo "$(INFO) Running the most up-to-date image"
+	@echo "$(INFO) Pulling latest docker image for branch: newtonsystems/$(REPO):master"
+	@docker pull newtonsystems/$(REPO):master; if [ $$? -ne 0 ] ; then \
+		echo "$(ERROR) Failed to find image in registry: newtonsystems/$(REPO):master1"; \
+		read -r -p "$(GREEN) Specific your own image name or Ctrl+C to exit:$(RESET)   " reply; \
+		docker pull newtonsystems/$(REPO):$$reply; \
+		$(DOCKER_RUN_COMMAND) newtonsystems/$(REPO):$$reply app; \
+	else \
+		$(DOCKER_RUN_COMMAND) newtonsystems/$(REPO):master app; \
+	fi
+
+run: build                   ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off
+	@echo "$(INFO) Running docker container with tag: $(REPO):local"
+	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
+
+run-dev: build-dev           ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off based of Dockerfile.dev (Development Debug Only)
+	@echo "$(WARN) Running docker container with tag: $(REPO):local (USING Dockerfile.dev) (ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING)"
+	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
+
+daemon: build                ##@local Builds and run docker container with tag: '$(REPO):local' as a daemon
+	@echo "$(INFO) Running docker container with tag: $(REPO):local as a daemon ..."
+	$(DOCKER_RUN_COMMAND) -d $(REPO):local app
+
+build:                       ##@local Builds the local Dockerfile 
+	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
+	@docker image build -t $(REPO):local -f Dockerfile .
+
+
+build-dev:                       ##@local Builds the local Dockerfile 
+	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
+	@docker image build -t $(REPO):local -f Dockerfile --build-arg APP_ENV=dev .
+
+build-deb:                   ##@local Builds the local Dockerfile.dev (Development Dockerfile (Not run in production)). Useful if you need to debug a container (Installs helpful tools)
+	@echo "$(WARN) Building the Container locally with tag: $(REPO):local using Development Dockerfile (Do not run unless you need to and know what you are doing)"
+	@docker image build -t $(REPO):local -f Dockerfile.dev .
+
+stop:                        ##@local Stops all docker containers with tag: '$(REPO):local' and name '$(REPO)_local'
+	@if [ -n "`docker ps -a -q -f ancestor=$(REPO):local`" ]; then \
+		echo "$(INFO) Stopping all docker processes with tag: 'hello:local'"; \
+		docker stop `docker ps -a -q -f ancestor=$(REPO):local`; \
+	else \
+		$(call warn_message,  "No docker processes with image tag "'"$(REPO):local"'" found to stop."); \
+	fi
+
+	@if [ -n "`docker ps -a -q -f name=$(REPO)_local`" ]; then \
+		echo "$(INFO) Stopping all docker processes with name: 'hello_local'"; \
+		docker stop `docker ps -a -q -f name=$(REPO)_local`; \
+	else \
+		$(call warn_message,  "No docker processes with name "'"$(REPO)_local"'" found to stop."); \
+	fi
+
+shell: build-dev                  ##@local Run bash shell against the dockerized service 
+	@echo "$(INFO) Running lint tests against the docker container"
+	$(DOCKER_RUN_LOCAL_COMMAND) -it $(REPO):local /bin/bash
+
+remove: stop                 ##@local Stops and remove docker containers with tag: '$(REPO):local' and name '$(REPO)_local'
+	@if [ -n "`docker ps -a -q -f ancestor=$(REPO):local`" ]; then \
+		echo "$(INFO) Removing docker containers with tag: 'hello:local'"; \
+		docker rm `docker ps -a -q -f ancestor=$(REPO):local`; \
+	else \
+		$(call warn_message,  "No docker container with image tag "'"$(REPO):local"'" found to remove."); \
+	fi
+
+	@if [ -n "`docker ps -a -q -f name=$(REPO)_local`" ]; then \
+		echo "$(INFO) Removing docker containers with name: 'hello_local'"; \
+		docker rm `docker ps -a -q -f name=$(REPO)_local`; \
+	else \
+		$(call warn_message,  "No docker container with name "'"$(REPO):local"'" found to remove."); \
+	fi
+
+clean:                       ##@local Removes all docker processes, containers and images for '$(REPO):local'
+	@echo "$(INFO) Cleaning all docker processes, containers and images for $(REPO):local"
+	make stop
+	make remove
+
+	@if [ -n "`docker images hello:local -q`" ]; then \
+		echo "$(INFO) Removing docker images with tag: 'hello:local'"; \
+		docker rmi `docker images hello:local -q`; \
+	else \
+		$(call warn_message,  "No docker container with image name "'"$(REPO):local"'" found to remove."); \
+	fi
+
+check: build-dev                      ##@local-test Run regression tests against the dockerized service (Run before commit/merge i.e. don't break regression)
+	@echo "$(INFO) Running some tests inside the container"
+	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local run_tests.sh
+
+lint: build                  ##@local-test Run lint tests against the dockerized service 
+	@echo "$(INFO) Running lint tests against the docker container"
+	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local pylint -r y --output-format=colorized --load-plugins=pylint.extensions.check_docs app
+
+
+
+
+
+
+
 
 local-logs:
 	kubectl logs -f --tail=50 `kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | grep hello`
