@@ -1,0 +1,22 @@
+app.client package
+==================
+
+Submodules
+----------
+
+app.client.client module
+------------------------
+
+.. automodule:: app.client.client
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: app.client
+    :members:
+    :undoc-members:
+    :show-inheritance:

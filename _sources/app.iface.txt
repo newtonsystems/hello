@@ -1,0 +1,22 @@
+app.iface package
+=================
+
+Submodules
+----------
+
+app.iface.world module
+----------------------
+
+.. automodule:: app.iface.world
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: app.iface
+    :members:
+    :undoc-members:
+    :show-inheritance:
