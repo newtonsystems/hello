@@ -123,3 +123,53 @@ TODO
 - protos to docs??
 - write a pylint specifically for protobuf
 - need confif node name etc how to get it update environement variables on the fly
+
+
+
+
+
+
+
+
+- TRY external database thingy one last time
+- finish service basic
+- then cookiecutter the shit out of it
+
+
+
+
+- environment variables
+- stability issues
+- minor issues 
+- relability 
+- tornado?
+- exception handling??
+
+
+
+- Fix linker-viz and zipkin + add namerd
+
+- create a command to create kubneretts yml from docker - like demo-deployment.uaml
+
+- auto documenting python and grpc 
+
+
+
+
+
+# - Write commands for docker machine then disable
+# - Disable mount for kubernetes
+# - comment them out in k8s with a note 
+
+
+
+
+
+
+
+
+
+
+
+
+

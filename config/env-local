@@ -1,5 +1,0 @@
-# Postgresql Docker Service
-# =========================
-POSTGRES_DB=test1
-POSTGRES_USER=root
-POSTGRES_PASSWORD=password

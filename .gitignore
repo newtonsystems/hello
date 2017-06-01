@@ -1,3 +1,4 @@
+minikube-mounts
 wheelhouse
 *.log
 *.pyc
