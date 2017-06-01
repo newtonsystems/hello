@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Requirements &mdash; hello 0.1.0 documentation</title>
+  <title>app.tests package &mdash; hello 0.1.0 documentation</title>
   
 
   
@@ -31,7 +31,9 @@
 
   
     <link rel="top" title="hello 0.1.0 documentation" href="index.html"/>
-        <link rel="prev" title="app.tests package" href="app.tests.html"/> 
+        <link rel="up" title="app package" href="app.html"/>
+        <link rel="next" title="Requirements" href="requirements.html"/>
+        <link rel="prev" title="app.iface package" href="app.iface.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -83,16 +85,32 @@
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
-<li class="toctree-l1"><a class="reference internal" href="app.html">app package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="app.client.html">app.client package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="app.iface.html">app.iface package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="app.tests.html">app.tests package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Requirements</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#basic-requirements">Basic Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#django-test-requirements">Django Test Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#django-docs-requirements">Django Docs Requirements</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="app.html">app package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="app.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="app.client.html">app.client package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.iface.html">app.iface package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">app.tests package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-app.tests.test_main">app.tests.test_main module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-app.tests">Module contents</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#module-app.service">app.service module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.html#module-app">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="app.client.html">app.client package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.iface.html">app.iface package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">app.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-app.tests.test_main">app.tests.test_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-app.tests">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="requirements.html">Requirements</a></li>
 </ul>
 
             
@@ -123,11 +141,13 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Requirements</li>
+          <li><a href="app.html">app package</a> &raquo;</li>
+      
+    <li>app.tests package</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="_sources/requirements.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/app.tests.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -137,43 +157,27 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="requirements">
-<h1>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="basic-requirements">
-<h2>Basic Requirements<a class="headerlink" href="#basic-requirements" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Python 2.7, 3.2, 3.3, 3.4, or 3.5</li>
-<li>Django (1.8.6+)</li>
-<li>djangorestframework</li>
-<li>python-dateutil</li>
-<li>markdown2</li>
-<li>beautifulsoup4</li>
-<li>Pygments</li>
-</ul>
+  <div class="section" id="app-tests-package">
+<h1>app.tests package<a class="headerlink" href="#app-tests-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="django-test-requirements">
-<h2>Django Test Requirements<a class="headerlink" href="#django-test-requirements" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>tox</li>
-<li>django_dynamic_fixture</li>
-<li>django_nose</li>
-<li>pytest</li>
-<li>pytest-django</li>
-<li>pytest-xdist</li>
-<li>pytest-coverage</li>
-<li>nose-progressive</li>
-<li>responses&gt;=0.4.0</li>
-<li>freezegun</li>
-</ul>
+<div class="section" id="module-app.tests.test_main">
+<span id="app-tests-test-main-module"></span><h2>app.tests.test_main module<a class="headerlink" href="#module-app.tests.test_main" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="app.tests.test_main.TestMain">
+<em class="property">class </em><code class="descclassname">app.tests.test_main.</code><code class="descname">TestMain</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#app.tests.test_main.TestMain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<dl class="method">
+<dt id="app.tests.test_main.TestMain.test_ok">
+<code class="descname">test_ok</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.tests.test_main.TestMain.test_ok" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
-<div class="section" id="django-docs-requirements">
-<h2>Django Docs Requirements<a class="headerlink" href="#django-docs-requirements" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>sphinx</li>
-<li>recommonmark</li>
-<li>sphinx-git</li>
-<li>sphinx_rtd_theme</li>
-</ul>
+<div class="section" id="module-app.tests">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app.tests" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -184,8 +188,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="requirements.html" class="btn btn-neutral float-right" title="Requirements" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="app.tests.html" class="btn btn-neutral" title="app.tests package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="app.iface.html" class="btn btn-neutral" title="app.iface package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

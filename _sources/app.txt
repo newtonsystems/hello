@@ -8,6 +8,7 @@ Subpackages
 
     app.client
     app.iface
+    app.tests
 
 Submodules
 ----------

@@ -30,7 +30,9 @@
   
 
   
-    <link rel="top" title="hello 0.1.0 documentation" href="index.html"/> 
+    <link rel="top" title="hello 0.1.0 documentation" href="index.html"/>
+        <link rel="next" title="app.client package" href="app.client.html"/>
+        <link rel="prev" title="Features" href="features.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -79,9 +81,27 @@
           
             
             
-                <ul>
+                <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">app package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.client.html">app.client package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.iface.html">app.iface package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="app.tests.html">app.tests package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-app.service">app.service module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hello-service">hello.service</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-app">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="app.client.html">app.client package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.iface.html">app.iface package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="app.tests.html">app.tests package</a></li>
 <li class="toctree-l1"><a class="reference internal" href="requirements.html">Requirements</a></li>
 </ul>
 
@@ -135,14 +155,26 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="app.client.html">app.client package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="app.client.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.client.html#app-client-client-module">app.client.client module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.client.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.client.html#module-app.client.client">app.client.client module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.client.html#hello-client-client">hello.client.client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.client.html#module-app.client">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="app.iface.html">app.iface package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="app.iface.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.iface.html#app-iface-world-module">app.iface.world module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.iface.html#module-contents">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.iface.html#module-app.iface.world">app.iface.world module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="app.iface.html#hello-iface-world">hello.iface.world</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="app.iface.html#module-app.iface">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="app.tests.html">app.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="app.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.tests.html#module-app.tests.test_main">app.tests.test_main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="app.tests.html#module-app.tests">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -151,11 +183,57 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="app-service-module">
-<h2>app.service module<a class="headerlink" href="#app-service-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-app.service">
+<span id="app-service-module"></span><h2>app.service module<a class="headerlink" href="#module-app.service" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="hello-service">
+<h3>hello.service<a class="headerlink" href="#hello-service" title="Permalink to this headline">¶</a></h3>
+<p>The hello service of the GRPC</p>
+<dl class="class">
+<dt id="app.service.Helloer">
+<em class="property">class </em><code class="descclassname">app.service.</code><code class="descname">Helloer</code><a class="headerlink" href="#app.service.Helloer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">grpc_types.hello_pb2_grpc.HelloServicer</span></code></p>
+<dl class="attribute">
+<dt id="app.service.Helloer.name">
+<code class="descname">name</code><em class="property"> = 'hello'</em><a class="headerlink" href="#app.service.Helloer.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="app.service.Helloer.sayHello">
+<code class="descname">sayHello</code><span class="sig-paren">(</span><em>request</em>, <em>context</em><span class="sig-paren">)</span><a class="headerlink" href="#app.service.Helloer.sayHello" title="Permalink to this definition">¶</a></dt>
+<dd><p>Say Hello to user name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="app.service.serve">
+<code class="descclassname">app.service.</code><code class="descname">serve</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.service.serve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summary line.</p>
+<p>Extended description of function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>arg1</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Description of arg1</li>
+<li><strong>arg2</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Description of arg2</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Description of return value</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-app">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -164,12 +242,21 @@
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="app.client.html" class="btn btn-neutral float-right" title="app.client package" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="features.html" class="btn btn-neutral" title="Features" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2016, James Tarball.
+        &copy; Copyright 2017, newtonsystems.
 
     </p>
   </div>
