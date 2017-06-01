@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to django-accounts’s documentation! &mdash; django-accounts 0.1.0 documentation</title>
+  <title>Welcome to hello’s documentation! &mdash; hello 0.1.0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="django-accounts 0.1.0 documentation" href="#"/>
+    <link rel="top" title="hello 0.1.0 documentation" href="#"/>
         <link rel="next" title="Changelog" href="changelog.html"/> 
 
   
@@ -49,7 +49,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> django-accounts
+            <a href="#" class="icon icon-home"> hello
           
 
           
@@ -97,7 +97,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="#">django-accounts</a>
+        <a href="#">hello</a>
       </nav>
 
 
@@ -114,7 +114,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="#">Docs</a> &raquo;</li>
       
-    <li>Welcome to django-accounts&#8217;s documentation!</li>
+    <li>Welcome to hello&#8217;s documentation!</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -128,8 +128,80 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="welcome-to-django-accounts-s-documentation">
-<h1>Welcome to django-accounts&#8217;s documentation!<a class="headerlink" href="#welcome-to-django-accounts-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="welcome-to-hello-s-documentation">
+<h1>Welcome to hello&#8217;s documentation!<a class="headerlink" href="#welcome-to-hello-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p># docker-pyramid
+A dockerized pyramid web server</p>
+<p>Find the documentation: <a class="reference external" href="https://javaab.github.io/wiki">https://javaab.github.io/wiki</a></p>
+<p>uses cookiecutter <a class="reference external" href="https://github.com/Pylons/pyramid-cookiecutter-starter">https://github.com/Pylons/pyramid-cookiecutter-starter</a></p>
+<p>maybe should use <a class="reference external" href="https://github.com/Pylons/pyramid-cookiecutter-alchemy">https://github.com/Pylons/pyramid-cookiecutter-alchemy</a> for the future maybe?</p>
+<p>MIGHT NEED A USER MANAGER - ADD / CREATE ETC</p>
+<p>TODO
+- sort logging
+- sort documentation</p>
+<p># port is already allcoated for postgres
+pg_ctl -D /usr/local/var/postgres stop -s -m fast</p>
+<ul class="simple">
+<li>Sort out pshell utility</li>
+</ul>
+<hr class="docutils" />
+<ul class="simple">
+<li>NEED TO DEFAULT PORT EXPOSE DOCKERFILE, MAKEFILE LOCAL-RUN, ETC, KUBERNETES (NO STATIC 50000)</li>
+</ul>
+<p>TODO:
+- research prometheus and grafana to set up some useful alerting / graphing when in local development</p>
+<div class="section" id="usages">
+<h2>USAGES<a class="headerlink" href="#usages" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="debug-mode">
+<h2>DEBUG MODE<a class="headerlink" href="#debug-mode" title="Permalink to this headline">¶</a></h2>
+<p>We have a useful mode for debugging docker containers. This is especially useful if you need to ssh into the container.</p>
+<ul class="simple">
+<li>This mode uses <cite>Dockerfile.dev</cite></li>
+<li>Dockerfile.dev calls debug.txt from config/requirements which will include useful debugging python packages</li>
+</ul>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>sh
+make build-dev
+make run</p>
+<p>If you have docker-utils in your path you can then ssh into the most recent container
+<code class="docutils literal"><span class="pre">`</span>
+<span class="pre">docker-into-most-recent-container</span>
+<span class="pre">`</span></code></p>
+</div>
+<div class="section" id="new-repo">
+<h2>new repo<a class="headerlink" href="#new-repo" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>need to create a repo in dokcer hub</li>
+<li>need to create collabraotr</li>
+<li>need to pull i think first</li>
+<li>then can login and push</li>
+</ul>
+</div>
+<div class="section" id="todo">
+<h2>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Deploy via wheelhouse and setup.py !!</li>
+<li>docs that work and take stuff from the ptyhon code -&gt; swagger maybe</li>
+<li>protos to docs??</li>
+<li>write a pylint specifically for protobuf</li>
+<li>need confif node name etc how to get it update environement variables on the fly</li>
+<li>TRY external database thingy one last time</li>
+<li>finish service basic</li>
+<li>then cookiecutter the shit out of it</li>
+<li>environment variables</li>
+<li>stability issues</li>
+<li>minor issues</li>
+<li>relability</li>
+<li>tornado?</li>
+<li>exception handling??</li>
+<li>Fix linker-viz and zipkin + add namerd</li>
+<li>create a command to create kubneretts yml from docker - like demo-deployment.uaml</li>
+<li>auto documenting python and grpc</li>
+</ul>
+<p># - Write commands for docker machine then disable
+# - Disable mount for kubernetes
+# - comment them out in k8s with a note</p>
+</div>
 </div>
 <div class="section" id="contents">
 <h1>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h1>
