@@ -16,4 +16,5 @@ Contents
 
    changelog
    features
+   app*
    requirements
