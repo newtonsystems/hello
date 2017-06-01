@@ -122,3 +122,4 @@ TODO
 - docs that work and take stuff from the ptyhon code -> swagger maybe
 - protos to docs??
 - write a pylint specifically for protobuf
+- need confif node name etc how to get it update environement variables on the fly

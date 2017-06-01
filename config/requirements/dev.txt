@@ -13,3 +13,9 @@ sphinx_rtd_theme
 pylint
 nose
 coverage
+
+
+# relauncher
+# ==========
+watchdog
+psutil

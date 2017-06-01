@@ -15,16 +15,12 @@ spec:
         run: hello
     spec:
       containers:
-      - image: hello:create
+      - image: hello:local
         args: ["app"]
         name: hello
-        ports:
-        - containerPort: 50000
-        - name: NODE_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: spec.nodeName
-        # env:
+        env:
+        - name: ENV_TYPE
+          value: dev
         # - name: POD_NAME
         #   valueFrom:
         #     fieldRef:
@@ -39,16 +35,19 @@ spec:
         #       fieldPath: metadata.namespace
         #- name: http_proxy
         #  value: http://192.168.99.100:4140
+        ports:
+        - containerPort: 50000
+        # Pod Volumes
         volumeMounts:
         - mountPath: /app
           name: app-volume
-      #   - mountPath: /usr/local/src/libutils
-      #     name: libutils-volume
-      # # Host Volumes
+        #- mountPath: /usr/local/src/libutils
+        #  name: libutils-volume
+      # Host Volumes
       volumes:
       - name: app-volume
         hostPath:
-          path: /Users/danvir/.minikube-mounts/hello/app
-      # - name: libutils-volume
-      #   hostPath:
-      #     path: /Users/.minikube-mounts/hello/libutils
+          path: /Users/danvir/Masterbox/sideprojects/github/newtonsystems/hello/minikube-mounts/hello/app
+      #- name: libutils-volume
+      #  hostPath:
+      #    path: /Users/danvir/Masterbox/sideprojects/github/newtonsystems/hello/minikube-mounts/hello/libutils

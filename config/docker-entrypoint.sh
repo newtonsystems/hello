@@ -43,9 +43,21 @@ if [ "$1" = 'app' ]; then
 	# overlays the docker container folder we need to manually 
 	# copy at the entrypoint stage
 	cp -r /tmp/wheelhouse /
-	python /app/service.py
 
-
+	echo "running django $ENV_TYPE server ... "
+	if [ "$ENV_TYPE" = 'dev' ]; then
+		while true
+		do
+        	python /app/service.py &
+        	inotifywait /app -e create -e modify
+        	pkill python
+		done
+	elif [ "$ENV_TYPE" = 'prod' ]; then
+		python /app/service.py
+	else
+		echo "ERROR: Neither production, development or test environment selected (ENV_TYPE=$ENV_TYPE is not valid)"
+		exit 1
+	fi
 
 
 

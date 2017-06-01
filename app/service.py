@@ -26,9 +26,9 @@ class Helloer(hello_pb2_grpc.HelloServicer):
 
     def sayHello(self, request, context):
         """ Say Hello to user name. """
-        log.info("Saying Hello for name: %s", request.name)
-        message = str(world.sayWorld(request.name))
-        # message = request.name
+        log.info("Saying Hello hot-reloaded for name: %s", request.name)
+        #message = str(world.sayWorld(request.name))
+        message = request.name + '  hot-reloaded'
         return hello_pb2.HelloReply(message=message)
 
 
@@ -40,7 +40,7 @@ def serve():
     hello_pb2_grpc.add_HelloServicer_to_server(helloer, service)
     service.add_insecure_port('[::]:50000')
 
-    log.info("Starting a %s service: %s on 50000", helloer.name, service)
+    log.info("Sta3rting a %s service: %s on 50000", helloer.name, service)
     service.start()
 
     try:

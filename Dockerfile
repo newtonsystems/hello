@@ -29,7 +29,7 @@ ENV ENV_TYPE ${APP_ENV}
 ENV APP_DIR /app
 ENV BUILD_DIR /tmp
 ENV PYTHON_PACKAGE_LOCATION /usr/local/src
-ENV DEVPI_INDEX_URL http://devpi.tetherboxapp.com:3141/newtonsystems/master
+ENV DEVPI_INDEX_URL http://34.203.112.178:3141/newtonsystems/master
 
 
 
@@ -48,6 +48,7 @@ RUN apk add --update --virtual .build-deps \
         autoconf \
         automake \
         libtool \
+        inotify-tools \
     && rm -rf /var/cache/apk/*
 
 
@@ -71,16 +72,16 @@ COPY wheelhouse/ $BUILD_DIR/wheelhouse
 VOLUME ["wheelhouse"]
 # Build a directory of wheels for pyramid and all its dependencies
 RUN pip wheel -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
-    --extra-index-url http://devpi.tetherboxapp.com:3141/newtonsystems/master \
-    --trusted-host devpi.tetherboxapp.com \
+    --extra-index-url http://34.203.112.178:3141/newtonsystems/master \
+    --trusted-host 34.203.112.178 \
     --find-links=$BUILD_DIR/wheelhouse \
     --wheel-dir=$BUILD_DIR/wheelhouse
 
 # FUTURE GET IT FROM CHACH REMOTE MAYEB
 # Install from cached wheels
 RUN pip install --use-wheel -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
-    --extra-index-url http://devpi.tetherboxapp.com:3141/newtonsystems/master \
-    --trusted-host devpi.tetherboxapp.com \
+    --extra-index-url http://34.203.112.178:3141/newtonsystems/master \
+    --trusted-host 34.203.112.178 \
     --find-links=$BUILD_DIR/wheelhouse \
     --src $PYTHON_PACKAGE_LOCATION
 

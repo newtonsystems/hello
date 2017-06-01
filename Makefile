@@ -18,7 +18,7 @@ CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 # PYTHON_INSTALL=
 
 # export PYTHON_INSTALL
-
+#kubectl get pods - -o go-template='{{range .items}}{{if eq .status.phase "Running"}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | grep $(PROJECT_NAME)
 # ifndef GENEITY_ENV
 # 	#Calls to docker-env
 # 	DEPS=. docker-env -n rabbitmq rabbitmq 5672,15672 &&
@@ -34,7 +34,10 @@ CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 
 # minikube ?
 
-
+	# kubectl get pods -o go-template='{{range .items}}{{if eq .status.phase "Running"}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | grep $(PROJECT_NAME)
+	# @echo "2222222"
+	# JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}' \
+ # && kubectl get pods -o jsonpath=$JSONPATH | grep "Ready=True"
 
 
 # all: run
@@ -102,7 +105,12 @@ CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 #########
 # local-linkerd-ping
 
+MAC_IP_ADDR=$(ifconfig | grep -A 1 'en0' | tail -1 | cut -d ' ' -f 2 | cut -d ' ' -f 1)
 
+# sudo ifconfig lo0 alias 192.168.99.101
+# sudo ifconfig lo0 -alias 173.20.18.22
+#
+#https://serverfault.com/questions/102416/iptables-equivalent-for-mac-os-x
 
 
 #
@@ -128,6 +136,8 @@ CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 # kube-env
 # kube-logs
 # kube-dashboard
+
+ 
 
 
 NO_COLOR=\033[0m
@@ -177,13 +187,16 @@ TIMESTAMP=tmp-$(shell date +%s )
 PROJECT_DIR=..
 
 
-
+# NEED TO CHANGE INFRA TO USE PROJECT_DIR!!!!!
 
 # https://github.com/linkerd/linkerd/wiki/Flavors-of-Kubernetes
 ADMIN_PORT=`kubectl get svc linkerd -o jsonpath='{.spec.ports[?(@.name=="admin")].nodePort}'`
 OUTGOING_PORT=`kubectl get svc linkerd -o jsonpath='{.spec.ports[?(@.name=="outgoing")].nodePort}'`
 INCOMING_PORT=`kubectl get svc linkerd -o jsonpath='{.spec.ports[?(@.name=="incoming")].nodePort}'`
 LINKERVIZ_PORT=`kubectl get svc linkerd-viz -o jsonpath='{.spec.ports[?(@.name=="grafana")].nodePort}'`
+
+
+
 
 
 
@@ -201,6 +214,7 @@ PING_ADMIN=http://`minikube ip`:$(ADMIN_PORT)/admin/ping
 # Powered by https://gist.github.com/prwhite/8168133
 #COLORS
 GREEN  := $(shell tput -Txterm setaf 2)
+BLUE   := $(shell tput -Txterm setaf 4)
 WHITE  := $(shell tput -Txterm setaf 7)
 YELLOW := $(shell tput -Txterm setaf 3)
 RESET  := $(shell tput -Txterm sgr0)
@@ -219,6 +233,30 @@ HELP_FUN = \
     print "  ${YELLOW}$$_->[0]${RESET}$$sep${GREEN}$$_->[1]${RESET}\n"; \
     }; \
     print "\n"; }
+
+FORCE_IGNORE_PREQ_TEST=false
+
+#
+# Basic Prerequisite tests
+#
+ifeq ($(FORCE_IGNORE_PREQ_TEST), false)
+
+    # Basic Prerequisite test: Is docker running?
+    ifneq ('$(shell docker --version)', 'Docker version 17.03.1-ce, build c6d412e') 
+        $(error Docker is not running. Please run start docker.)
+    endif 
+
+    # Basic Prerequisite test: Is Minikube running?
+    ifneq ('$(shell minikube status | grep minikubeVM)', 'minikubeVM: Running')
+        $(error Minikube is not running. Please run 'minikube start'.)
+    endif
+
+    ifneq ('$(shell nghttpx -v)', 'nghttpx nghttp2/1.23.1')
+        $(error nghttpx is not current installed or is a different version.)
+    endif
+
+endif
+
 
 help: ##@other Show this help.
 	@perl -e '$(HELP_FUN)' $(MAKEFILE_LIST)
@@ -253,6 +291,11 @@ help-common-troubleshooting:
 	@echo "3.) Disable and then enable heapster addon: ${GREEN}minikube addons disable heapster; minikube addons enable heapster;${RESET}"
 
 
+proj-clean:
+	echo "jdks"
+	rm -rf minikube-mounts
+
+
 
 kube-clean:                       ##@cleanup Cleans Up Kubernetes Environment. Deletes all kubernetes components (services, pods, config, deployments ... etc)
 	kubectl delete deployment --all
@@ -261,20 +304,19 @@ kube-clean:                       ##@cleanup Cleans Up Kubernetes Environment. D
 	kubectl delete services --all
 	kubectl delete pods --all
 	kubectl delete configmap --all
+	-@eval $$(minikube docker-env); docker-rm-unnamed-images;
+
 
 #
 # Infrastructure
 #
+
 infra-recreate:              ##@infrastructure Recreates all critical infrastructure components to run with your service (via minikube/k8s)
 	@echo "$(INFO) Re-creating Infrastructure Components"
 	make infra-delete
 	make infra-create
 
 infra-create:                ##@infrastructure Creates all critical infrastructure components (via minikube/k8s)
-	@if [ '$(shell minikube status | grep minikubeVM)' != 'minikubeVM: Running' ]; then \
-		echo "$(ERROR) Minikube is not running. Please run 'minikube start'."; \
-		exit 1; \
-	fi
 	@echo "$(INFO) Creating Infrastructure Components"
 	kubectl apply -f ../devops/k8s/deploy/local/
 
@@ -285,6 +327,8 @@ infra-delete:                ##@infrastructure Deletes all critical instructure 
 #
 # Infrastructure helper commands
 #
+.PHONY: infra-ui infra-linkerd-ping
+
 infra-ui:                    ##@infrastructure-helper-commands Open all infrastructure's UIs. Perfect for monitoring, debugging and tracing microservices.
 	@echo "$(INFO) Opening minikube dashboard (Kubernetes dashboard)"
 	@minikube dashboard
@@ -309,37 +353,74 @@ infra-linkerd-ping:          ##@infrastructure-helper-commands Pings linkerd's a
 
 
 #
-# Build Service Locally + Deploy locally to Minikube
+# Build Service Locally + Deploy as a pod/service in minikube
 #
-.PHONY: local-kube-recreate local-kube-create local-kube-delete local-kube-update
+.PHONY: kube-local-recreate kube-local-create kube-local-delete kube-local-update kube-local-mount
 
-kube-local-update:           ##@kube-local
-	@eval $$(minikube docker-env) ;\
-	docker image build -t $(REPO):$(TIMESTAMP) -f Dockerfile .
+POD_NAME=`kubectl get pods -o wide | grep $(PROJECT_NAME) | grep Running | cut -d ' ' -f1`
+LINKERD_POD_NAME=`kubectl get pods -o go-template='{{range .items}}{{if eq .status.phase "Running"}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | grep linkerd | grep -v linkerd-viz`
+POD_PORT=`kubectl get svc $(PROJECT_NAME) -o jsonpath='{.spec.ports[?(@)].nodePort}'`
+
+
+kube-local-update:                                         ##@kube-local Updates service in minikube
 	@echo "$(INFO) Deploying $(REPO):$(TIMESTAMP) by replacing image in kubernetes deployment config"
+	@eval $$(minikube docker-env); docker image build -t $(REPO):$(TIMESTAMP) -f Dockerfile .
 	kubectl set image -f k8s/deploy/deployment.yaml $(PROJECT_NAME)=$(REPO):$(TIMESTAMP)
 
-kube-local-create:           ##@kube-local
-	@if [ '$(shell minikube status | grep minikubeVM)' != 'minikubeVM: Running' ]; then \
-		echo "$(ERROR) Minikube is not running. Please run 'minikube start'."; \
-		exit 1; \
-	fi
-	@echo "$(INFO) Creating Dockerfile and deploying to minikube."
-	eval $$(minikube docker-env) ;\
-	docker image build -t $(REPO):create -f Dockerfile .
-	kubectl create -f k8s/deploy/
+kube-local-mount:                                          ##@kube-local Creates mounts for minikube
+	@echo "$(INFO) Setting up kubernetes mounts at $(BLUE)minikube-mounts/$(PROJECT_NAME)$(RESET)"
+	@mkdir -p minikube-mounts/$(PROJECT_NAME)
+	@echo "$(WARN) Remember to add to k8s/deploy/deployment.yaml as well!"
+	@-ln -s \
+		${PWD}/app \
+		${PWD}/../libutils/libutils \
+	minikube-mounts/$(PROJECT_NAME)
+	@echo "$(INFO) $(BLUE)Creating the following symlinks:$(RESET)"
+	@ls -ltra minikube-mounts/$(PROJECT_NAME) | grep '\->'
 
-kube-local-delete:           ##@kube-local
+kube-local-create: kube-local-mount build                  ##@kube-local Create service and deploy to minikube
+	@echo "$(INFO) Building docker image: $(BLUE)hello:local$(RESET) and deploying to minikube."
+	kubectl create -f k8s/deploy/
+	
+	@echo "$(INFO) Wait for service to be ready"
+	./wait-for-it.sh -h `minikube ip` -p $(POD_PORT) -t 10
+	
+	@echo "$(INFO) Attaching to service logs"
+	@make kube-local-logs
+
+kube-local-delete:                                         ##@kube-local Delete service from minikube cluster
 	@echo "$(INFO) Deleting Service Components from minikube"
 	kubectl delete -f k8s/deploy/
+	@rm -rf minikube-mounts/$(PROJECT_NAME)
 
-kube-local-recreate: kube-local-delete kube-local-create   ##@kube-local
-	@echo "$(INFO) Recreating Service Components from minikube"
-
-
-
+kube-local-recreate: kube-local-delete kube-local-create   ##@kube-local Recreate service in minikube
+	@echo "$(INFO) Recreating Service Components in minikube"
 
 
+#
+# Kube local helper commands (great for debugging / development)
+#
+.PHONY: kube-local-linkerd-logs kube-local-logs kube-local-env kube-local-attach kube-local-six-hour-logs
+
+kube-local-linkerd-logs:     ##@kube-local-debug Tails linkerd logs
+	@echo "$(INFO) Attaching to service $(BLUE)$(LINKERD_POD_NAME)$(RESET) logs"
+	kubectl logs -f --tail=50 $(LINKERD_POD_NAME) linkerd
+
+kube-local-logs:              ##@kube-local-debug Tails logs for the container
+	@echo "$(INFO) Attaching to pod $(BLUE)$(POD_NAME)$(RESET) logs"
+	@kubectl logs -f --tail=50 $(POD_NAME)
+
+kube-local-env:              ##@kube-local-debug Prints environment variables for the container 
+	@echo "$(INFO) Printing the environment variables for $(BLUE)$(POD_NAME)$(RESET)"
+	@kubectl exec $(POD_NAME) printenv
+
+kube-local-attach:           ##@kube-local-debug Attachs to the container with a shell
+	@echo "$(INFO) Attaching a shell to $(BLUE)$(POD_NAME)$(RESET)"
+	kubectl exec -it $(POD_NAME) -- /bin/bash
+
+kube-local-six-hour-logs:    ##@kube-local-debug Last six hours worth of logs for $(PROJECT_NAME)
+	@echo "$(INFO)  $(BLUE)$(POD_NAME)$(RESET) logs for the last $(BLUE)six$(RESET) hours"
+	@kubectl logs --since=6h $(POD_NAME)
 
 
 #
@@ -347,18 +428,21 @@ kube-local-recreate: kube-local-delete kube-local-create   ##@kube-local
 #
 .PHONY: latest run run-dev daemon build build-dev stop clean check lint
 
+# This is the normal run command (if run from an image in production etc)
 DOCKER_RUN_COMMAND=docker run \
 	-e "L5D_PORT_4141_TCP=$(SERVICE_PORT)" \
 	-p 50000:50000 \
 	--name $(REPO)_local
 
-DOCKER_RUN_LOCAL_COMMAND=docker run --rm -t \
+# This is local run command with added volume capability
+#--net mynet123 --ip 172.20.18.22
+DOCKER_RUN_LOCAL_COMMAND=docker run --rm -it  \
 	-p 50000:50000 \
 	-e "L5D_PORT_4141_TCP=$(SERVICE_PORT)" \
 	--name $(REPO)_local \
-	-v ${PWD}/app:/app \
+	-v ${PWD}/app:/app #\
 	#-v ${PWD}../../libutils:/usr/local/src/libutils \
-	-v ${PWD}./wheelhouse:/wheelhouse
+	#-v ${PWD}./wheelhouse:/wheelhouse
 
 
 latest:                      ##@local Run the most up-to-date image for your branch from the docker registry or if the image doesnt exist yet you can specify. (When you want to run as service as a black-box)
@@ -373,9 +457,10 @@ latest:                      ##@local Run the most up-to-date image for your bra
 		$(DOCKER_RUN_COMMAND) newtonsystems/$(REPO):master app; \
 	fi
 
-run: build                   ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off
+## Development Workflow 2 (See above for information or make help-show-normal-usage)
+run: build                   ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off. ##@local (dev-workflow-2) Runs docker container on same network as minikube making it accessible from kubernetes minikube and other kubernetes services
 	@echo "$(INFO) Running docker container with tag: $(REPO):local"
-	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
+	eval $$(minikube docker-env) && $(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
 
 run-dev: build-dev           ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off based of Dockerfile.dev (Development Debug Only)
 	@echo "$(WARN) Running docker container with tag: $(REPO):local (USING Dockerfile.dev) (ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING)"
@@ -387,7 +472,7 @@ daemon: build                ##@local Builds and run docker container with tag: 
 
 build:                       ##@local Builds the local Dockerfile 
 	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
-	@docker image build -t $(REPO):local -f Dockerfile .
+	@eval $$(minikube docker-env); docker image build --build-arg APP_ENV=dev -t $(REPO):local -f Dockerfile .
 
 
 build-dev:                       ##@local Builds the local Dockerfile 
@@ -454,26 +539,19 @@ lint: build                  ##@local-test Run lint tests against the dockerized
 
 
 
+##############
+
+deploy-cloud:
+	echo "specify cloud are you sure -- very importatn"
+	echo "afdjkds"
 
 
 
-
-
-local-logs:
-	kubectl logs -f --tail=50 `kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | grep hello`
-	echo "TODO"
-
-local-logs-last-hours:
-	echo "TODO"
-
-local-attach:
-	echo "TODO"
+connect-to-kube:
+	@echo "start nghttpx"
 
 
 
-
-local-linkerd-logs:
-	kubectl logs -f --tail=50 `kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | grep l5d` l5d
 
 
 
@@ -486,18 +564,8 @@ local-check:
 # 	make cmd run="py.test --cov --cov-report=term-missing"
 	kubectl exec hello-1887293505-8s7v9 -- printenv
 
-local-env:
-	@echo "$(INFO) Printing the environment variables for the container"
-	kubectl exec hello-1887293505-8s7v9 printenv
 
 
-mount:
-	@echo "Setting up mount as symlink in ~/.minikube-mounts folder"
-	$(shell sudo mkdir -p ~/.minikube-mounts/hello)
-	#$(shell sudo mkdir -p ~/.minikube-mounts/hello/libutils)
-	$(shell sudo ln -s ${PWD}/app ~/.minikube-mounts/hello/app)
-	$(shell sudo ln -s ${PWD}/libutils ~/.minikube-mounts/hello/libutils)
-	@echo $(shell ls ~/.minikube-mounts/hello)
 
 
 
