@@ -53,6 +53,9 @@ clean:
 
 .PHONY: html
 html:
+	@echo "Build auto-documenting files from source code"
+	sphinx-apidoc -fMT -o source ../app
+	@echo
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -94,9 +97,9 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/django-blog.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/hello.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/django-blog.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/hello.qhc"
 
 .PHONY: applehelp
 applehelp:
@@ -113,8 +116,8 @@ devhelp:
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/django-blog"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/django-blog"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/hello"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/hello"
 	@echo "# devhelp"
 
 .PHONY: epub

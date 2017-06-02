@@ -34,7 +34,7 @@ function checkLastCommand
 if [ "$1" = 'app' ]; then
 	echo -e "$INFO Running a $ENV_TYPE environment ... "
 	if [ "$ENV_TYPE" = 'dev' ]; then
-		echo "$INFO Copying any newly created wheelhouse packages over to /wheelhouse"
+		echo -e "$INFO Copying any newly created wheelhouse packages over to /wheelhouse"
 		# Ok, we want to have the python packages cached when in 
 		# development via wheels:
 		# This is done by host volume mounting but as that 
@@ -54,11 +54,11 @@ if [ "$1" = 'app' ]; then
 	elif [ "$ENV_TYPE" = 'test' ]; then
 		python /app/service.py
 	else
-		echo "$ERROR Neither production, development or test environment selected (ENV_TYPE=$ENV_TYPE is not valid)"
+		echo -e "$ERROR Neither production, development or test environment selected (ENV_TYPE=$ENV_TYPE is not valid)"
 		exit 1
 	fi
 else
-	echo "$WARN Not running 'app'"
+	echo -e "$WARN Not running 'app'"
 fi
 
 exec "$@"

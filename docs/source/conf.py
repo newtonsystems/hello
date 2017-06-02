@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# django-accounts documentation build configuration file, created by
+# hello documentation build configuration file, created by
 # sphinx-quickstart on Sat Sep 10 11:53:23 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -16,9 +16,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../'))
+
 
 # -- General configuration ------------------------------------------------
 
@@ -31,11 +32,26 @@
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
     'sphinx.ext.githubpages',
     'sphinx_git',
 ]
+
+# Napoleon settings http://www.sphinx-doc.org/en/stable/ext/napoleon.html
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -54,9 +70,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'django-accounts'
-copyright = u'2016, James Tarball'
-author = u'James Tarball'
+project = u'hello'
+copyright = u'2017, newtonsystems'
+author = u'newtonsystems'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -142,7 +158,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'django-accounts v0.0.1'
+# html_title = u'hello v0.0.1'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -242,7 +258,7 @@ html_static_path = ['_static']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'django-accountsdoc'
+htmlhelp_basename = 'hellodoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -268,7 +284,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'django-accounts.tex', u'django-accounts Documentation',
+    (master_doc, 'hello.tex', u'hello Documentation',
      u'James Tarball', 'manual'),
 ]
 
@@ -310,7 +326,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'django-accounts', u'django-accounts Documentation',
+    (master_doc, 'hello', u'hello Documentation',
      [author], 1)
 ]
 
@@ -325,8 +341,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'django-accounts', u'django-accounts Documentation',
-     author, 'django-accounts', 'One line description of project.',
+    (master_doc, 'hello', u'hello Documentation',
+     author, 'hello', 'One line description of project.',
      'Miscellaneous'),
 ]
 

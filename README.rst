@@ -22,8 +22,11 @@ TODO
 pg_ctl -D /usr/local/var/postgres stop -s -m fast
 
 
+---------------------------------------------------
 
+deploy_sphinx_docs.sh hello docs/build/html/
 
+------------------------------------------------------
 
 - Sort out pshell utility
 

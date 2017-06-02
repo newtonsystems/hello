@@ -33,6 +33,24 @@ class Helloer(hello_pb2_grpc.HelloServicer):
 
 
 def serve():
+    """Summary line.
+
+    Extended description of function.
+
+    Args:
+        arg1 (int): Description of arg1
+        arg2 (str): Description of arg2
+
+    Returns:
+        bool: Description of return value
+
+    Examples:
+        Examples should be written in doctest format, and should illustrate how
+        to use the function.
+
+        >>> print([i for i in example_generator(4)])
+        [0, 1, 2, 3]
+    """
     log.info("Running on Host: %s", os.getenv("HOSTNAME"))
     service = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     helloer = Helloer()
@@ -40,7 +58,7 @@ def serve():
     hello_pb2_grpc.add_HelloServicer_to_server(helloer, service)
     service.add_insecure_port('[::]:50000')
 
-    log.info("Sta3rting a %s service: %s on 50000", helloer.name, service)
+    log.info("Starting a %s service: %s on 50000", helloer.name, service)
     service.start()
 
     try:

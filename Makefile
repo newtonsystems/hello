@@ -11,6 +11,14 @@ SERVICE_PORT=4141
 
 CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 
+
+
+
+MAC_IP_ADDR=$(ifconfig | grep -A 1 'en0' | tail -1 | cut -d ' ' -f 2 | cut -d ' ' -f 1)
+INCOMING_DEV_WORKFLOW_2_ADDR=$(MAC_IP_ADDR)
+INCOMING_DEV_WORKFLOW_2_PORT=50000
+
+
 # #Calls to docker-env
 #DEPS=
 
@@ -105,7 +113,7 @@ CURRENT_BRANCH=`git rev-parse --abbrev-ref HEAD`
 #########
 # local-linkerd-ping
 
-MAC_IP_ADDR=$(ifconfig | grep -A 1 'en0' | tail -1 | cut -d ' ' -f 2 | cut -d ' ' -f 1)
+
 
 # sudo ifconfig lo0 alias 192.168.99.101
 # sudo ifconfig lo0 -alias 173.20.18.22
@@ -293,7 +301,7 @@ help-common-troubleshooting:
 
 proj-clean:
 	echo "jdks"
-	rm -rf minikube-mounts
+	rm -rf .minikube-mounts
 
 
 
@@ -368,15 +376,15 @@ kube-local-update:                                         ##@kube-local Updates
 	kubectl set image -f k8s/deploy/deployment.yaml $(PROJECT_NAME)=$(REPO):$(TIMESTAMP)
 
 kube-local-mount:                                          ##@kube-local Creates mounts for minikube
-	@echo "$(INFO) Setting up kubernetes mounts at $(BLUE)minikube-mounts/$(PROJECT_NAME)$(RESET)"
-	@mkdir -p minikube-mounts/$(PROJECT_NAME)
+	@echo "$(INFO) Setting up kubernetes mounts at $(BLUE).minikube-mounts/$(PROJECT_NAME)$(RESET)"
+	@mkdir -p .minikube-mounts/$(PROJECT_NAME)
 	@echo "$(WARN) Remember to add to k8s/deploy/deployment.yaml as well!"
 	@-ln -s \
 		${PWD}/app \
 		${PWD}/../libutils/libutils \
-	minikube-mounts/$(PROJECT_NAME)
+	.minikube-mounts/$(PROJECT_NAME)
 	@echo "$(INFO) $(BLUE)Creating the following symlinks:$(RESET)"
-	@ls -ltra minikube-mounts/$(PROJECT_NAME) | grep '\->'
+	@ls -ltra .minikube-mounts/$(PROJECT_NAME) | grep '\->'
 
 kube-local-create: kube-local-mount build                  ##@kube-local Create service and deploy to minikube
 	@echo "$(INFO) Building docker image: $(BLUE)hello:local$(RESET) and deploying to minikube."
@@ -391,7 +399,7 @@ kube-local-create: kube-local-mount build                  ##@kube-local Create 
 kube-local-delete:                                         ##@kube-local Delete service from minikube cluster
 	@echo "$(INFO) Deleting Service Components from minikube"
 	kubectl delete -f k8s/deploy/
-	@rm -rf minikube-mounts/$(PROJECT_NAME)
+	@rm -rf .minikube-mounts/$(PROJECT_NAME)
 
 kube-local-recreate: kube-local-delete kube-local-create   ##@kube-local Recreate service in minikube
 	@echo "$(INFO) Recreating Service Components in minikube"
@@ -460,7 +468,9 @@ latest:                      ##@local Run the most up-to-date image for your bra
 ## Development Workflow 2 (See above for information or make help-show-normal-usage)
 run: build                   ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off. ##@local (dev-workflow-2) Runs docker container on same network as minikube making it accessible from kubernetes minikube and other kubernetes services
 	@echo "$(INFO) Running docker container with tag: $(REPO):local"
-	eval $$(minikube docker-env) && $(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
+	@echo "$(BLUE)"
+	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
+	@echo "$(NO_COLOR)"
 
 run-dev: build-dev           ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off based of Dockerfile.dev (Development Debug Only)
 	@echo "$(WARN) Running docker container with tag: $(REPO):local (USING Dockerfile.dev) (ONLY DO THIS IF YOU KNOW WHAT YOU ARE DOING)"
@@ -472,8 +482,11 @@ daemon: build                ##@local Builds and run docker container with tag: 
 
 build:                       ##@local Builds the local Dockerfile 
 	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
-	@eval $$(minikube docker-env); docker image build --build-arg APP_ENV=dev -t $(REPO):local -f Dockerfile .
+	@docker image build --build-arg APP_ENV=dev -t $(REPO):local -f Dockerfile .
 
+build-dm:                       ##@local Builds the local Dockerfile for docker-machine environment
+	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
+	@eval $$(minikube docker-env); docker image build --build-arg APP_ENV=dev -t $(REPO):local -f Dockerfile .
 
 build-dev:                       ##@local Builds the local Dockerfile 
 	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
@@ -538,17 +551,41 @@ lint: build                  ##@local-test Run lint tests against the dockerized
 	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local pylint -r y --output-format=colorized --load-plugins=pylint.extensions.check_docs app
 
 
+# Example Configuration
+#
+# frontend=192.168.1.237,50000;;no-tls
+# backend=0.0.0.0,50000;/;proto=h2
+# private-key-file=/etc/ssl/private/my.ssl.key
+# certificate-file=/etc/ssl/private/my.ssl.pem
+# workers=1
+# http2-proxy=yes
+# log-level=INFO
+
+start-nghttpx:
+	nghttpx 
+	#--frontend=$(MAC_IP_ADDR),50000
+
+
 
 ##############
 
 deploy-cloud:
+	echo "
+		frontend=192.168.1.237,50000;;no-tls
+		backend=0.0.0.0,50000;/;proto=h2
+		private-key-file=/etc/ssl/private/my.ssl.key  
+		certificate-file=/etc/ssl/private/my.ssl.pem
+		workers=1
+		http2-proxy=yes
+		log-level=INFO
+	"
 	echo "specify cloud are you sure -- very importatn"
 	echo "afdjkds"
 
 
 
 connect-to-kube:
-	@echo "start nghttpx"
+	@echo "$(WARN) Make sure nghttpx is running 'make start-nghttpx'"
 
 
 
