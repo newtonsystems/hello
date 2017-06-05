@@ -21,16 +21,6 @@ if [ "${1:0:1}" = '-' ]; then
 	set -- app "$@"
 fi
 
-function checkLastCommand 
-{
-	if [ $? == 0 ]; then
-		echo $(printf "%s ok" "$1")
-	else
-		echo $(printf "%s failed" "$1")
-		exit 1
-	fi
-}  
-
 if [ "$1" = 'app' ]; then
 	echo -e "$INFO Running a $ENV_TYPE environment ... "
 	if [ "$ENV_TYPE" = 'dev' ]; then

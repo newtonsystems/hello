@@ -14,12 +14,12 @@
 #sphinx-git
 #sphinx_rtd_theme
 
+
+flake8
+pylint
+
 #pylint
 #nose
 #coverage
 
 
-# relauncher
-# ==========
-#watchdog
-#psutil

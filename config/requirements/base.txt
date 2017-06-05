@@ -1,6 +1,4 @@
 pyramid
-flake8
-pylint
 grpc_types
 flask
 waitress
