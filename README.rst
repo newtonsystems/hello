@@ -5,7 +5,7 @@ hello
 Supported tags and respective `Dockerfile` links
 ------------------------------------------------
 
--    [`v0.1.0`, `latest` (/Dockerfile*)](https://github.com/newtonsystems/docker-python-grpc-service-base/blob/master/Dockerfile)
+-    [`v*.*.*`, `latest`, `master`, `featuretest` (/Dockerfile*)](https://github.com/newtonsystems/docker-python-grpc-service-base/blob/master/Dockerfile)
 
 
 A gRPC python microservice
@@ -122,6 +122,36 @@ Run all other services to minikube + locally run docker container (hot-reloaded 
       ## ctrl+c (stop running container) then make some dev changes ##
       ## Maybe a make build ##
       make run
+
+
+How to do a release
+===================
+
+- Make sure you are using docker-utils 
+i.e.
+
+```bash
+export PATH="~/<LOCATION>/docker-utils/bin:$PATH"
+```
+
+```
+build-tag-push-dockerfile.py  --image "newtonsystems/hello" --version 0.1.0 --dockerhub_release --github_release
+```
+
+
+User Feedback
+=============
+
+Any feedback or comments  would be greatly appreciated: <james.tarball@newtonsystems.co.uk>
+
+
+Issues
+======
+
+If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/newtonsystems/hello/issues).
+
+You can also reach me by email. I would be happy to help  <james.tarball@newtonsystems.co.uk>
+
 
 
 
