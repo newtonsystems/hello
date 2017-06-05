@@ -104,21 +104,22 @@ Make changes and update the image using kubernetes.
       ## Make some dev changes ##
       make kube-update
 
-Run all other services to minikube + minikube docker environment locally run docker container
+Run all other services to minikube + minikube docker environment locally run docker container (N)
 `````````````````````````````````````````````````````````````````````````````````````````````
    ::
 
       make infra-create
-      make kube-create
+      make build-dm
+      make run-dm (You must use incoming-dev-workflow-1 to connect external to services) 
       ## Make some dev changes ##
-      make kube-update
+      make run-dm
 
 Run all other services to minikube + locally run docker container (hot-reloaded capable)
 `````````````````````````````````````````````````````````````````````````````````````````````
    ::
 
       make infra-create
-      make run
+      make run (You must use incoming-dev-workflow-2 to connect external to services) 
       ## ctrl+c (stop running container) then make some dev changes ##
       ## Maybe a make build ##
       make run
