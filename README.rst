@@ -5,7 +5,7 @@ hello
 Supported tags and respective `Dockerfile` links
 ------------------------------------------------
 
--    [`v*.*.*`, `latest`, `master`, `featuretest` (/Dockerfile*)](https://github.com/newtonsystems/docker-python-grpc-service-base/blob/master/Dockerfile)
+-    [`v*.*.*`, `latest`, `master`, `featuretest` (/Dockerfile*)](https://github.com/newtonsystems/hello/blob/master/Dockerfile)
 
 
 A gRPC python microservice
