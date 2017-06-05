@@ -448,7 +448,7 @@ DOCKER_RUN_LOCAL_COMMAND=docker run --rm -it  \
 	-p 50000:50000 \
 	-e "L5D_PORT_4141_TCP=$(SERVICE_PORT)" \
 	--name $(REPO)_local \
-	-v ${PWD}/app:/app #\
+	-v ${PWD}/app:/usr/local/src/hello/app #\
 	#-v ${PWD}../../libutils:/usr/local/src/libutils \
 	#-v ${PWD}./wheelhouse:/wheelhouse
 
@@ -481,7 +481,7 @@ daemon: build                ##@local Builds and run docker container with tag: 
 	$(DOCKER_RUN_COMMAND) -d $(REPO):local app
 
 build:                       ##@local Builds the local Dockerfile 
-	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
+	@echo "$(INFO) Building the 'dev' Container locally with tag: $(REPO):local"
 	@docker image build --build-arg APP_ENV=dev -t $(REPO):local -f Dockerfile .
 
 build-dm:                       ##@local Builds the local Dockerfile for docker-machine environment

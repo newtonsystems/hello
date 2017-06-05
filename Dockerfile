@@ -10,54 +10,14 @@
 # Our aim to make this image as small as possible
 
 # We use alpine over Debian as its only 5MB
-FROM python:2.7.13-alpine
-MAINTAINER James Tarball <james.tarball@newtonsystems.co.uk>
-
-
-
-
-# Add Label Badges to Dockerfile powered by microbadger
-ARG VCS_REF
-
-LABEL org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url="e.g. https://github.com/microscaling/microscaling"
-
-
-ARG APP_ENV=prod
-ENV ENV_TYPE ${APP_ENV}
-
-ENV APP_DIR /app
-ENV BUILD_DIR /tmp
-ENV PYTHON_PACKAGE_LOCATION /usr/local/src
-ENV DEVPI_INDEX_URL http://34.203.112.178:3141/newtonsystems/master
-
-
-
-RUN apk add --update --virtual .build-deps \
-        git \
-        bash \
-        python-dev \
-        py-pip \
-        build-base \
-        git \
-        musl-dev \
-        linux-headers \
-        make \
-        gcc \
-        g++ \
-        autoconf \
-        automake \
-        libtool \
-        inotify-tools \
-    && rm -rf /var/cache/apk/*
-
-
+FROM newtonsystems/docker-python-grpc-service-base:0.1.0
 
 #RUN if [ "$ENV_TYPE" = "dev" ]; then \
 #		sudo pip install -e ".[testing]"; \
 		
 #	fi 
-
+ARG APP_ENV=prod
+ENV ENV_TYPE ${APP_ENV}
 
 
 # 1. Copy pip requirements to BUILD_DIR
@@ -68,6 +28,9 @@ RUN apk add --update --virtual .build-deps \
 #       - set index to branch specific netwonsystems index
 COPY config/requirements $BUILD_DIR/requirements
 COPY wheelhouse/ $BUILD_DIR/wheelhouse
+
+COPY app $PYTHON_PACKAGE_LOCATION/hello/app
+COPY setup.py $PYTHON_PACKAGE_LOCATION/hello
 
 VOLUME ["wheelhouse"]
 # Build a directory of wheels for pyramid and all its dependencies
@@ -87,7 +50,7 @@ RUN pip install --use-wheel -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
 
 
 # Add Label Badges to Dockerfile powered by microbadger
-COPY app /app
+#COPY app /app
 
 # Add all useful scripts to bin path
 COPY config/bin /usr/local/bin/

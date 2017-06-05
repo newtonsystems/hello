@@ -51,14 +51,14 @@ def serve():
         >>> print([i for i in example_generator(4)])
         [0, 1, 2, 3]
     """
-    log.info("Running on Host: %s", os.getenv("HOSTNAME"))
+    log.info("Running on host: %s", os.getenv("HOSTNAME"))
     service = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     helloer = Helloer()
 
     hello_pb2_grpc.add_HelloServicer_to_server(helloer, service)
     service.add_insecure_port('[::]:50000')
 
-    log.info("Starting a %s service: %s on 50000", helloer.name, service)
+    log.info("Starting a %s service: %s on port 50000", helloer.name, service)
     service.start()
 
     try:

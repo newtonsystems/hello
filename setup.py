@@ -25,7 +25,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'run-hello=app.main:serve',
+            'run-app=app.service:serve',
         ],
     },
 )

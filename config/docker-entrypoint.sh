@@ -45,14 +45,14 @@ if [ "$1" = 'app' ]; then
 		echo -e "$INFO Setting up a simple watcher using inotifywait ..."
 		while true
 		do
-        	python /app/service.py &
-        	inotifywait /app -e create -e modify
+        	run-app &
+        	inotifywait /usr/local/src/hello/app -e create -e modify
         	pkill python
 		done
 	elif [ "$ENV_TYPE" = 'prod' ]; then
-		python /app/service.py
+		run-app
 	elif [ "$ENV_TYPE" = 'test' ]; then
-		python /app/service.py
+		run-app
 	else
 		echo -e "$ERROR Neither production, development or test environment selected (ENV_TYPE=$ENV_TYPE is not valid)"
 		exit 1
