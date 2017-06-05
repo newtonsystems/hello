@@ -90,6 +90,8 @@ There are three possible ways to develop this app:
    2. Run all other services in minikube and run the this app locally using minikube docker environment. The docker container will run in the minikube VM host.
    3. Run all other services in minikube. Use a special router in linkerd pointing to nghttpx which proxys the gRPC message to a locally running docker app
 
+1 + 3 are the normal development workflow. Hot-reloaded does NOT run in 2.
+
 Develop & Deploy to minikube
 ````````````````````````````
 
@@ -102,8 +104,24 @@ Make changes and update the image using kubernetes.
       ## Make some dev changes ##
       make kube-update
 
+Run all other services to minikube + minikube docker environment locally run docker container
+`````````````````````````````````````````````````````````````````````````````````````````````
+   ::
 
+      make infra-create
+      make kube-create
+      ## Make some dev changes ##
+      make kube-update
 
+Run all other services to minikube + locally run docker container (hot-reloaded capable)
+`````````````````````````````````````````````````````````````````````````````````````````````
+   ::
+
+      make infra-create
+      make run
+      ## ctrl+c (stop running container) then make some dev changes ##
+      ## Maybe a make build ##
+      make run
 
 
 
