@@ -130,13 +130,14 @@ How to do a release
 - Make sure you are using docker-utils 
 i.e.
 
-```bash
-export PATH="~/<LOCATION>/docker-utils/bin:$PATH"
-```
+   ::
 
-```
-build-tag-push-dockerfile.py  --image "newtonsystems/hello" --version 0.1.0 --dockerhub_release --github_release
-```
+      export PATH="~/<LOCATION>/docker-utils/bin:$PATH"
+
+
+   ::
+
+      build-tag-push-dockerfile.py  --image "newtonsystems/hello" --version 0.1.0 --dockerhub_release --github_release
 
 
 User Feedback
@@ -151,15 +152,4 @@ Issues
 If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/newtonsystems/hello/issues).
 
 You can also reach me by email. I would be happy to help  <james.tarball@newtonsystems.co.uk>
-
-
-
-
-
-
-
-
-
-
-
 
