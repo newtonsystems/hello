@@ -91,6 +91,8 @@ There are three possible ways to develop this app:
    3. Run all other services in minikube. Use a special router in linkerd pointing to nghttpx which proxys the gRPC message to a locally running docker app
 
 Develop & Deploy to minikube
+````````````````````````````
+
 Run the infrastructure services (and any other services) then deploy app to minikube.
 Make changes and update the image using kubernetes.
    ::
