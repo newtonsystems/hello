@@ -26,9 +26,15 @@ Available from docker hub as [newtonsystems/tools/hello](https://hub.docker.com/
 
 
 - Run this basic Makefile command to build the Docker image:
-```bash
+
+    .. code:: python
+
+    import this
+
+
+.. code:: python
 	make build
-```
+
 
 Essentially the Docker build does the following:
     - copies app/ and setup.py
