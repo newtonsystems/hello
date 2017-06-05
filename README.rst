@@ -1,12 +1,6 @@
 hello
 =====
 
-[![](https://images.microbadger.com/badges/image/newtonsystems/hello.svg)](https://microbadger.com/images/newtonsystems/hello "Get your own image badge on microbadger.com")
-
-[![](https://images.microbadger.com/badges/version/newtonsystems/hello.svg)](https://microbadger.com/images/newtonsystems/hello "Get your own version badge on microbadger.com")
-
-Available from docker hub as [newtonsystems/tools/hello](https://hub.docker.com/r/newtonsystems/hello/)
-
 
 Supported tags and respective `Dockerfile` links
 ------------------------------------------------
@@ -20,7 +14,6 @@ A gRPC python microservice
 - gRPC python server
 - hot-reloading via inotify
 - Deployment to minikube
-
 
 How to Build the Docker Image
 -----------------------------
@@ -42,9 +35,9 @@ Other useful build commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - Run docker build for a different environment e.g. test
-```bash
-  docker build -t <TAG_NAME> --build-arg APP_ENV=test .
-```
+   ::
+
+      docker build -t <TAG_NAME> --build-arg APP_ENV=test .
 
 - Run a debug Dockerfile (for debugging a container - useful packages installed e.g. iPython, bash-completion etc.)
 `NOTE: only run this if you know what you are doing`
@@ -89,17 +82,15 @@ Other useful run commands
 
       make run-dm
 
-
-
 How to develop this app
 =======================
 There are three possible ways to develop this app:
-1. Develop & Deploy to minikube
-2. Run all other services in minikube and run the this app locally using minikube docker environment. The docker container will run in the minikube VM host.
-3. Run all other services in minikube. Use a special router in linkerd pointing to nghttpx which proxys the gRPC message to a locally running docker app
 
-1. Develop & Deploy to minikube
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   1. Develop & Deploy to minikube
+   2. Run all other services in minikube and run the this app locally using minikube docker environment. The docker container will run in the minikube VM host.
+   3. Run all other services in minikube. Use a special router in linkerd pointing to nghttpx which proxys the gRPC message to a locally running docker app
+
+Develop & Deploy to minikube
 Run the infrastructure services (and any other services) then deploy app to minikube.
 Make changes and update the image using kubernetes.
    ::
@@ -109,35 +100,6 @@ Make changes and update the image using kubernetes.
       ## Make some dev changes ##
       make kube-update
 
-
-
-How to do a release
-===================
-
-- Make sure you are using docker-utils 
-i.e.
-
-```bash
-export PATH="~/<LOCATION>/docker-utils/bin:$PATH"
-```
-
-```
-build-tag-push-dockerfile.py  --image "newtonsystems/hello" --version 0.1.0 --dockerhub_release --github_release
-```
-
-
-User Feedback
-=============
-
-Any feedback or comments  would be greatly appreciated: <james.tarball@newtonsystems.co.uk>
-
-
-Issues
-======
-
-If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/newtonsystems/docker-python-grpc-service-base/issues).
-
-You can also reach me by email. I would be happy to help  <james.tarball@newtonsystems.co.uk>
 
 
 
