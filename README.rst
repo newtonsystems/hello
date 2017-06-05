@@ -125,6 +125,29 @@ Run all other services to minikube + locally run docker container (hot-reloaded 
       make run
 
 
+DEBUG MODE
+==========
+As mentioned before we have a useful mode for debugging docker containers. This is especially useful if you need to ssh into the container.
+
+- This mode uses `Dockerfile.dev`
+- Dockerfile.dev calls debug.txt from config/requirements which will include useful debugging python packages
+
+   ::
+
+      make build-dev
+      make run
+
+
+If you have docker-utils in your path you can then ssh into the most recent container 
+
+   ::
+
+      docker-into-most-recent-container
+
+
+
+
+
 How to do a release
 ===================
 
