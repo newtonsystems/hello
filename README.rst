@@ -126,7 +126,7 @@ Run all other services to minikube + locally run docker container (hot-reloaded 
 
 
 DEBUG MODE
-==========
+----------
 As mentioned before we have a useful mode for debugging docker containers. This is especially useful if you need to ssh into the container.
 
 - This mode uses `Dockerfile.dev`
@@ -143,9 +143,6 @@ If you have docker-utils in your path you can then ssh into the most recent cont
    ::
 
       docker-into-most-recent-container
-
-
-
 
 
 How to do a release
@@ -165,15 +162,41 @@ i.e.
 
 
 User Feedback
-=============
+-------------
 
 Any feedback or comments  would be greatly appreciated: <james.tarball@newtonsystems.co.uk>
 
 
 Issues
-======
+------
 
 If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/newtonsystems/hello/issues).
 
 You can also reach me by email. I would be happy to help  <james.tarball@newtonsystems.co.uk>
+
+TODO
+====
+- Deploy via wheelhouse and setup.py !!
+- docs that work and take stuff from the ptyhon code -> swagger maybe
+- protos to docs??
+- write a pylint specifically for protobuf
+- need confif node name etc how to get it update environement variables on the fly
+- TRY external database thingy one last time
+- finish service basic
+- then cookiecutter the shit out of it
+- environment variables
+- stability issues
+- minor issues 
+- relability 
+- tornado?
+- exception handling??
+- Fix linker-viz and zipkin + add namerd
+- create a command to create kubneretts yml from docker - like demo-deployment.uaml
+- auto documenting python and grpc 
+- Write commands for docker machine then disable
+- Disable mount for kubernetes
+- comment them out in k8s with a note 
+
+
+
 
