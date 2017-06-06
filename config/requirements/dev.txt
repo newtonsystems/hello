@@ -1,25 +1,9 @@
 -r base.txt
 
--e /usr/local/src/hello
-
-
--e git+https://github.com/javaab/libutils.git#egg=libutils
-
-# Include all packages useful for testing and debug
-
-# docs supports
-# ====================
-#sphinx
-#recommonmark
-#sphinx-git
-#sphinx_rtd_theme
-
-
+# Include all packages useful for testing
 flake8
 pylint
 
-#pylint
-#nose
-#coverage
 
-
+-e git+https://github.com/javaab/libutils.git#egg=libutils
+-e /usr/local/src/hello

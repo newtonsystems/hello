@@ -1,5 +1,5 @@
 #
-# A Docker Image for a gRPC python micorservice
+# A Docker Image for a gRPC python microservice
 #
 #
 # Please README.md for how to run this Docker Container

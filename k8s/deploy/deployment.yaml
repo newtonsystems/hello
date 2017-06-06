@@ -37,17 +37,21 @@ spec:
         #  value: http://192.168.99.100:4140
         ports:
         - containerPort: 50000
-        # Pod Volumes
-        volumeMounts:
-        - mountPath: /app
-          name: app-volume
-        #- mountPath: /usr/local/src/libutils
-        #  name: libutils-volume
-      # Host Volumes
-      volumes:
-      - name: app-volume
-        hostPath:
-          path: /Users/danvir/Masterbox/sideprojects/github/newtonsystems/hello/minikube-mounts/hello/app
-      #- name: libutils-volume
-      #  hostPath:
-      #    path: /Users/danvir/Masterbox/sideprojects/github/newtonsystems/hello/minikube-mounts/hello/libutils
+#
+# As hot-reloading doesnt work for docker-machine type env
+# there is no point to minikube volumes
+#
+#        # Pod Volumes
+#        volumeMounts:
+#        - mountPath: /app
+#          name: app-volume
+#        - mountPath: /usr/local/src/libutils
+#          name: libutils-volume
+#      # Host Volumes
+#      volumes:
+#      - name: app-volume
+#        hostPath:
+#          path: /Users/danvir/Masterbox/sideprojects/github/newtonsystems/hello/minikube-mounts/hello/app
+#      - name: libutils-volume
+#        hostPath:
+#          path: /Users/danvir/Masterbox/sideprojects/github/newtonsystems/hello/minikube-mounts/hello/libutils

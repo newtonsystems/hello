@@ -1,98 +1,59 @@
 #
-# A Docker Image for a gRPC python micorservice
+# A Development Debug Docker Image for a gRPC python microservice
 #
 #
-# Please README.md for how to run this Docker Container
+# DEBUG DOCKERFILE ONLY: DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING
 #
 #
-#  
-
-# Our aim to make this image as small as possible
-
-# We use alpine over Debian as its only 5MB
-FROM python:2.7.13-alpine
-MAINTAINER James Tarball <james.tarball@newtonsystems.co.uk>
-
-
-
-
-# Add Label Badges to Dockerfile powered by microbadger
-ARG VCS_REF
-
-LABEL org.label-schema.vcs-ref=$VCS_REF \
-      org.label-schema.vcs-url="e.g. https://github.com/microscaling/microscaling"
-
-
-
-ENV ENV_TYPE debug
-
-ENV APP_DIR /app
-ENV BUILD_DIR /tmp
-ENV PYTHON_PACKAGE_LOCATION /usr/local/src
-ENV DEVPI_INDEX_URL http://devpi.tetherboxapp.com:3141/newtonsystems/master
-
-
+FROM newtonsystems/docker-python-grpc-service-base:0.1.0
 
 RUN apk add --update --virtual .build-deps \
-        git \
-        bash \
-        python-dev \
-        py-pip \
-        build-base \
         bash-completion \
-        git \
-        musl-dev \
-        linux-headers \
-        make \
-        gcc \
-        g++ \
-        autoconf \
-        automake \
-        libtool \
     && rm -rf /var/cache/apk/*
 
+ARG APP_ENV=debug
+ENV ENV_TYPE ${APP_ENV}
 
+# Set pypi index - You should be set to branch to pull the correct packages
+ARG PYPI_INDEX=master
 
-#RUN if [ "$ENV_TYPE" = "dev" ]; then \
-#		sudo pip install -e ".[testing]"; \
-		
-#	fi 
+# Add all useful scripts to bin path
+COPY config/bin /usr/local/bin/
 
+# Copy source code and setup.py to python package area
+COPY app $PYTHON_PACKAGE_LOCATION/hello/app
+COPY setup.py $PYTHON_PACKAGE_LOCATION/hello
 
 
 # 1. Copy pip requirements to BUILD_DIR
-# 2. 
-#   - Install requirements based on environment type (development / production etc)
-#   - Install with:
-#       - wheelhouse support (for fast caching)
-#       - set index to branch specific netwonsystems index
+# 2. Install requirements based on environment type (development / production etc)
+#    Install with:
+#            - wheelhouse support (for fast caching)
+#            - pypi index to branch specific (newtonsystems/<index>)
+
+# Copy .whl files and pip requirements to BUILD_DIR
 COPY config/requirements $BUILD_DIR/requirements
 COPY wheelhouse/ $BUILD_DIR/wheelhouse
 
-VOLUME ["wheelhouse"]
 # Build a directory of wheels for pyramid and all its dependencies
 RUN pip wheel -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
-    --extra-index-url http://devpi.tetherboxapp.com:3141/newtonsystems/master \
-    --trusted-host devpi.tetherboxapp.com \
+    --extra-index-url http://$DEVPI_SERVER/newtonsystems/$PYPI_INDEX \
+    --trusted-host $DEVPI_SERVER \
     --find-links=$BUILD_DIR/wheelhouse \
     --wheel-dir=$BUILD_DIR/wheelhouse
 
-# FUTURE GET IT FROM CHACH REMOTE MAYEB
-# Install from cached wheels
+# Install from cached wheels (install editables to PYTHON_PACKAGE_LOCATION)
 RUN pip install --use-wheel -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
-    --extra-index-url http://devpi.tetherboxapp.com:3141/newtonsystems/master \
-    --trusted-host devpi.tetherboxapp.com \
+    --extra-index-url http://$DEVPI_SERVER/newtonsystems/$PYPI_INDEX \
+    --trusted-host $DEVPI_SERVER \
     --find-links=$BUILD_DIR/wheelhouse \
     --src $PYTHON_PACKAGE_LOCATION
 
 
-# Add Label Badges to Dockerfile powered by microbadger
-COPY app /app
-
+# Open port for server
 EXPOSE 50000
-ENV TERM=xterm
 
-
+# Run bash script for entrypoint
 COPY config/docker-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

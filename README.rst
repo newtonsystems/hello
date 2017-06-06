@@ -43,7 +43,7 @@ Other useful build commands
 `NOTE: only run this if you know what you are doing`
    ::
 
-      make build-dev
+      make build-debug
 
 - Run a docker build against the docker-machine / minikube environment
    ::
@@ -52,7 +52,7 @@ Other useful build commands
 
 How to Run the Docker Image
 -----------------------------
-- Run the app latest production image
+- Run the app latest production image (run black box)
    ::
 
       make run-latest-release
@@ -75,7 +75,7 @@ Other useful run commands
 - Run a debug Dockerfile.dev image (Only do this if you know what you are doing)
    ::
 
-      make run-dev
+      make run-debug
 
 - Run a docker build against the docker-machine / minikube environment
    ::
@@ -134,7 +134,7 @@ As mentioned before we have a useful mode for debugging docker containers. This 
 
    ::
 
-      make build-dev
+      make build-debug
       make run
 
 
@@ -176,6 +176,7 @@ You can also reach me by email. I would be happy to help  <james.tarball@newtons
 
 TODO
 ====
+- add command line support via python package cant remement in client.py
 - Deploy via wheelhouse and setup.py !!
 - docs that work and take stuff from the ptyhon code -> swagger maybe
 - protos to docs??
@@ -192,11 +193,9 @@ TODO
 - exception handling??
 - Fix linker-viz and zipkin + add namerd
 - create a command to create kubneretts yml from docker - like demo-deployment.uaml
-- auto documenting python and grpc 
-- Write commands for docker machine then disable
-- Disable mount for kubernetes
-- comment them out in k8s with a note 
-
-
-
-
+- ActiveDeadlineSeconds?? to deploy to environments in cloud
+   retstar policy never
+- Find a way to hot-reload for docker-machine envs
+# sudo ifconfig lo0 alias 192.168.99.101
+# sudo ifconfig lo0 -alias 173.20.18.22
+#https://serverfault.com/questions/102416/iptables-equivalent-for-mac-os-x

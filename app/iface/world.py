@@ -3,7 +3,7 @@
     hello.iface.world
     =================
 
-    GRPC hello service client.
+    Interface to world service
 """
 import os
 import grpc
