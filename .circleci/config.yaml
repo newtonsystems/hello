@@ -1,0 +1,42 @@
+#
+# Circle CI 2.0 Docs
+# 
+# For info, see: https://circleci.com/docs/2.0/
+#
+
+version: 2
+jobs:
+  build:
+    docker:
+      - image: newtonsystems/tools-docker-grpc-tools:0.2.0
+    working_directory: ~/hello
+    steps:
+      - checkout
+
+      - run:
+          name: Build gRPC types from protos
+          command: |
+            git clone -b $CIRCLE_BRANCH https://github.com/newtonsystems/protos.git
+            make all PROTOS_DIR=./protos
+
+      - deploy:
+          name: Commit auto-generated python gRPC types
+          command: |
+              git config --global user.email "$GITHUB_EMAIL" > /dev/null 2>&1
+              git config --global user.name "$GITHUB_USERNAME" > /dev/null 2>&1
+
+              # Only Commit & Push if there are changes
+              if [[ `git status --porcelain python/` ]]; then
+                  git add -A python/
+                  git commit --allow-empty -m "[ci skip] Auto commit for `cd protos && git log -1 --pretty=short --abbrev-commit`"
+                  git push origin $CIRCLE_BRANCH
+              fi
+
+      - deploy:
+          name: Deploy python package to devpi 
+          command: |
+              # NOTE: At the moment even no changes are packaged up into
+              #       a new python devpi package
+              cd python
+              ../.circleci/circle-upload-devpi.sh
+
