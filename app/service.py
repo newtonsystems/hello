@@ -25,7 +25,15 @@ class Helloer(hello_pb2_grpc.HelloServicer):
     name = 'hello'
 
     def sayHello(self, request, context):
-        """ Say Hello to user name. """
+        """ Say Hello to user name.
+
+            Args:
+                request (int): Description of arg1
+                context (str): Description of arg2
+
+            Returns:
+                hello_pb2.HelloReply: Description of return value
+        """
         log.info("Saying Hello hot-reloaded for name: %s", request.name)
         #message = str(world.sayWorld(request.name))
         message = request.name + '  hot-reloaded'

@@ -1,7 +1,4 @@
-pyramid
 grpc_types
-flask
-waitress
 coloredlogs
 futures
 grpcio

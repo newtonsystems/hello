@@ -1,8 +1,8 @@
 #
-# A Docker Image for a gRPC python micorservice
+# A Development Debug Docker Image for a gRPC python microservice
 #
 #
-# Please README.md for how to run this Docker Container
+# DEBUG DOCKERFILE ONLY: DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING
 #
 #
 FROM newtonsystems/docker-python-grpc-service-base:0.1.0

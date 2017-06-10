@@ -1,14 +1,21 @@
 #
-# A Docker Image for a gRPC python microservice
+# A Development Debug Docker Image for a gRPC python microservice
 #
 #
-# Please README.md for how to run this Docker Container
+# DEBUG DOCKERFILE ONLY: DO NOT USE UNLESS YOU KNOW WHAT YOU ARE DOING
 #
 #
 FROM newtonsystems/docker-python-grpc-service-base:0.1.0
 
+RUN apk add --update --virtual .build-deps \
+        bash-completion \
+    && rm -rf /var/cache/apk/*
 
-ARG APP_ENV=prod
+<<<<<<< HEAD
+# Set to debug! 
+=======
+>>>>>>> 6d5878dacd6b01050ee902f81d3a97aba5ebbc66
+ARG APP_ENV=debug
 ENV ENV_TYPE ${APP_ENV}
 
 # Set pypi index - You should be set to branch to pull the correct packages
