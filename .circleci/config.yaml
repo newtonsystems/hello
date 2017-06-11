@@ -12,25 +12,36 @@ jobs:
     working_directory: ~/hello
     steps:
       - checkout
+      - setup_remote_docker
 
       - run:
-          name: Build gRPC types from protos
+          name: Clone dev-utils repo (Development utility scripts/tools)
           command: |
-            git clone -b $CIRCLE_BRANCH https://github.com/newtonsystems/protos.git
-            make all PROTOS_DIR=./protos
+            git clone -b $CIRCLE_BRANCH https://github.com/newtonsystems/dev-utils.git
+
+      - run:
+          name: Run Regression Tests
+          command: |
+            make check
+
+      - run:
+          name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
+          command: |
+            docker build -t newtonsystems/$DOCKER_PROJECT_NAME:$CIRCLE_BRANCH .
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push newtonsystems/$DOCKER_PROJECT_NAME:$CIRCLE_BRANCH
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+                docker tag newtonsystems/$DOCKER_PROJECT_NAME:$CIRCLE_BRANCH newtonsystems/$DOCKER_PROJECT_NAME:latest
+                docker push newtonsystems/$DOCKER_PROJECT_NAME:latest
+            fi
 
       - deploy:
-          name: Commit auto-generated python gRPC types
+          name: Make and deploy sphinx documentation
           command: |
-              git config --global user.email "$GITHUB_EMAIL" > /dev/null 2>&1
-              git config --global user.name "$GITHUB_USERNAME" > /dev/null 2>&1
-
-              # Only Commit & Push if there are changes
-              if [[ `git status --porcelain python/` ]]; then
-                  git add -A python/
-                  git commit --allow-empty -m "[ci skip] Auto commit for `cd protos && git log -1 --pretty=short --abbrev-commit`"
-                  git push origin $CIRCLE_BRANCH
-              fi
+              # NOTE: At the moment even no changes are packaged up into
+              #       a new python devpi package
+              cd python
+              deploy_sphinx_docs.sh hello docs/build/html/
 
       - deploy:
           name: Deploy python package to devpi 

@@ -300,7 +300,7 @@ kube-six-hour-logs:          ##@kube-debug Last six hours worth of logs for $(PR
 #
 # Build Service Locally + Run locally
 #
-.PHONY: latest run run-dev daemon build build-dev stop clean check lint
+.PHONY: latest run run-dev daemon build build-debug stop clean check lint
 
 # This is the normal run command (if run from an image in production etc)
 DOCKER_RUN_COMMAND=docker run \
@@ -362,7 +362,8 @@ run-dm: build-dm             ##@local Builds and run docker container with tag: 
 
 build:                       ##@local Builds the local Dockerfile 
 	@echo "$(INFO) Building the 'dev' Container locally with tag: $(REPO):local"
-	@docker image build --build-arg APP_ENV=dev -t $(REPO):local -f Dockerfile .
+	docker image build --build-arg APP_ENV=dev --build-arg PYPI_INDEX=$(CURRENT_BRANCH) -t $(REPO):local -f Dockerfile .
+	@echo ""
 
 build-debug:                   ##@local Builds the local Dockerfile.dev (Development Dockerfile (Not run in production)). Useful if you need to debug a container (Installs helpful tools)
 	@echo "$(WARN) Building the Container locally with tag: $(REPO):local using Development Dockerfile (Do not run unless you need to and know what you are doing)"
@@ -387,7 +388,7 @@ stop:                        ##@local Stops all docker containers with tag: '$(R
 		$(call warn_message,  "No docker processes with name "'"$(REPO)_local"'" found to stop."); \
 	fi
 
-shell: build-dev                  ##@local Run bash shell against the dockerized service 
+shell: build                 ##@local Run bash shell against the dockerized service 
 	@echo "$(INFO) Running lint tests against the docker container"
 	$(DOCKER_RUN_LOCAL_COMMAND) -it $(REPO):local /bin/bash
 
@@ -418,7 +419,7 @@ clean:                       ##@local Removes all docker processes, containers a
 		$(call warn_message,  "No docker container with image name "'"$(REPO):local"'" found to remove."); \
 	fi
 
-check: build-dev             ##@local-test Run regression tests against the dockerized service (Run before commit/merge i.e. don't break regression)
+check: build                 ##@local-test Run regression tests against the dockerized service (Run before commit/merge i.e. don't break regression)
 	@echo "$(INFO) Running some tests inside the container"
 	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local run_tests.sh
 
