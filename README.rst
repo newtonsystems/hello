@@ -19,13 +19,38 @@
    :alt: Code Climate Badge
 
 
-libutils
-========
+hello
+=====
 A utility library
 
 
-The documentation can be found at: https://newtonsystems.github.io/libutils/
+The documentation can be found at: https://newtonsystems.github.io/hello/
 
+
+Supported tags and respective `Dockerfile` links
+------------------------------------------------
+
+-    [`v*.*.*`, `latest`, `master`, `featuretest` (/Dockerfile*)](https://github.com/newtonsystems/hello/blob/master/Dockerfile)
+
+
+A gRPC python microservice
+--------------------------
+
+- gRPC python server
+- hot-reloading via inotify
+- Deployment to minikube
+
+
+How to Build the Docker Image
+-----------------------------
+We have a fairly thorough Makefile to build and run this app in a number of different ways. 
+For more detailed explanation please see "How to develop this app"
+
+- Run this basic make command to build the docker image:
+
+.. code:: bash
+
+    make build
 
 Installation
 ------------
