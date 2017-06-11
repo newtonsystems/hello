@@ -22,7 +22,7 @@ jobs:
       - run:
           name: Run Regression Tests
           command: |
-            FORCE_IGNORE_PREQ_TEST=true make check
+            make check FORCE_IGNORE_PREQ_TEST=true
 
       - run:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
