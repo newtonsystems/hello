@@ -36,14 +36,6 @@ jobs:
             fi
 
       - deploy:
-          name: Make and deploy sphinx documentation
-          command: |
-              # NOTE: At the moment even no changes are packaged up into
-              #       a new python devpi package
-              cd python
-              deploy_sphinx_docs.sh hello docs/build/html/
-
-      - deploy:
           name: Deploy python package to devpi 
           command: |
               # NOTE: At the moment even no changes are packaged up into
@@ -51,3 +43,10 @@ jobs:
               cd python
               ../.circleci/circle-upload-devpi.sh
 
+      - deploy:
+          name: Make and deploy sphinx documentation
+          command: |
+              # NOTE: At the moment even no changes are packaged up into
+              #       a new python devpi package
+              cd python
+              deploy_sphinx_docs.sh hello docs/build/html/
