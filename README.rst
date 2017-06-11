@@ -5,7 +5,7 @@
 .. image:: https://images.microbadger.com/badges/version/newtonsystems/hello.svg
      :target: https://microbadger.com/images/newtonsystems/hell
 
-
+|
 
 .. image:: https://circleci.com/gh/newtonsystems/hello/tree/master.svg?style=shield
      :target: https://circleci.com/gh/javaab/hello/tree/master
