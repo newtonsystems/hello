@@ -426,6 +426,10 @@ check: build                 ##@local-test Run regression tests against the dock
 	@echo "$(INFO) Running some tests inside the container"
 	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local run_tests.sh
 
+circleci-check: build        ##@local-test Run regression tests against the dockerized service for circleci
+	@echo "$(INFO) Running some tests inside the container"
+	$(DOCKER_RUN_COMMAND) $(REPO):local run_tests.sh
+
 lint: build                  ##@local-test Run lint tests against the dockerized service 
 	@echo "$(INFO) Running lint tests against the docker container"
 	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local pylint -r y --output-format=colorized --load-plugins=pylint.extensions.check_docs app
