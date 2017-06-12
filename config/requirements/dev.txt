@@ -3,7 +3,8 @@
 # Include all packages useful for testing
 flake8
 pylint
-
+nose
+coverage
 
 -e git+https://github.com/javaab/libutils.git#egg=libutils
 -e /usr/local/src/hello
