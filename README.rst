@@ -82,6 +82,7 @@ Other useful build commands
 
     make build-dm
 
+
 How to Run the Docker Image
 -----------------------------
 - Run the app latest production image (run black box)
@@ -101,6 +102,33 @@ How to Run the Docker Image
 .. code:: bash
 
     make run
+
+Other useful run commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Run a debug Dockerfile.dev image (Only do this if you know what you are doing)
+
+.. code:: bash
+
+    make run-debug
+
+- Run a docker build against the docker-machine / minikube environment
+
+.. code:: bash
+
+    make run-dm
+
+
+How to develop this app
+------------------------
+There are three possible ways to develop this app:
+
+   1. Develop & Deploy to minikube
+   2. Run all other services in minikube and run the this app locally using minikube docker environment. The docker container will run in the minikube VM host.
+   3. Run all other services in minikube. Use a special router in linkerd pointing to nghttpx which proxys the gRPC message to a locally running docker app
+
+1 + 3 are the normal development workflow. Hot-reloaded does NOT run in 2.
+
 
 Installation
 ------------
