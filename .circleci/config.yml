@@ -22,7 +22,9 @@ jobs:
       - run:
           name: Run Regression Tests
           command: |
-            make check FORCE_IGNORE_PREQ_TEST=true
+            # Can't run make check FORCE_IGNORE_PREQ_TEST=true (docker volumes not supported)
+            make build
+            $(DOCKER_RUN_COMMAND) --rm -it run_tests.sh
 
       - run:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 

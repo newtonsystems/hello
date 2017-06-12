@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-easy_install doctest # doctest-eval
 echo "Running tests.."
 
 cd $PYTHON_PACKAGE_LOCATION/hello
