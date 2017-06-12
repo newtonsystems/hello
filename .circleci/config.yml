@@ -19,6 +19,14 @@ jobs:
       - checkout
       - setup_remote_docker
 
+      # Install Python py.test tools. (TODO: Skip install if already in cache.)
+      - run:
+          name: Install python requirements for deploy docs
+          command: |
+            pip install sphinx
+            pip install sphinx_rtd_theme
+            pip install sphinx_git
+
       - run:
           name: Clone dev-utils repo (Development utility scripts/tools)
           command: |
