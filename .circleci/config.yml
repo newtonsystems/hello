@@ -11,6 +11,7 @@ jobs:
       - image: newtonsystems/tools-docker-grpc-tools:0.2.1
     environment:
       DOCKER_PROJECT_NAME: hello
+      DEVPI_SERVER: https://devpi.newtonsystems.co.uk
       TEST_REPORTS: /tmp/test-reports
       COVERALLS_REPO_TOKEN: 8hXhaqC0aBuwUKkPUcoB2VRmehTsP4Mz1
       CODECLIMATE_REPO_TOKEN: d25f67d317327459d14dca522099c332c71ecaa6344cef14b04445bbf4686e9c
@@ -26,6 +27,7 @@ jobs:
             pip install sphinx
             pip install sphinx_rtd_theme
             pip install sphinx_git
+            pip install config/requirements/$dev.txt --extra-index-url $DEVPI_SERVER/newtonsystems/$CIRCLE_BRANCH --trusted-host $DEVPI_SERVER
 
       - run:
           name: Clone dev-utils repo (Development utility scripts/tools)
