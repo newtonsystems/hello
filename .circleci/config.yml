@@ -78,7 +78,7 @@ jobs:
               # NOTE: At the moment even no changes are packaged up into
               #       a new python devpi package
               pushd docs; make html ; popd
-              ~/dev-utils/bin/deploy_sphinx_docs.sh hello docs/build/html/
+              ~/dev-utils/bin/deploy_sphinx_docs.sh $CIRCLE_PROJECT_REPONAME docs/build/html/
 
       # Upload test results
       - store_test_results:
