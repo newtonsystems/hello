@@ -8,8 +8,21 @@ nosetests \
 	--with-doctest \
 	--with-xunit \
 	--with-coverage \
-	--cover-inclusive \
-	--cover-branch \
-	--cover-xml \
+	--cover-erase \
 	--nocapture \
 	--cover-package app
+
+# Send to Code Climate the test coverage
+send_to_codeclimate ()
+{
+	echo "Sending to codeclimate ..."
+	CODECLIMATE_REPO_TOKEN=$CODECLIMATE_REPO_TOKEN codeclimate-test-reporter
+}
+
+
+# "main"
+case "$1" in
+	--codeclimate)
+		send_to_codeclimate
+		;;
+esac
