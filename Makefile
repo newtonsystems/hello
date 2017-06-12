@@ -428,7 +428,7 @@ check: build                 ##@local-test Run regression tests against the dock
 
 circleci-check: build        ##@local-test Run regression tests against the dockerized service for circleci
 	@echo "$(INFO) Running some tests inside the container"
-	$(DOCKER_RUN_COMMAND) -e "CODECLIMATE_REPO_TOKEN=${CODECLIMATE_REPO_TOKEN}" $(REPO):local run_tests.sh
+	$(DOCKER_RUN_COMMAND) -e "CODECLIMATE_REPO_TOKEN=${CODECLIMATE_REPO_TOKEN}" $(REPO):local run_tests.sh --code-climate
 
 lint: build                  ##@local-test Run lint tests against the dockerized service 
 	@echo "$(INFO) Running lint tests against the docker container"

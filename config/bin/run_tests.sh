@@ -22,7 +22,7 @@ send_to_codeclimate ()
 
 # "main"
 case "$1" in
-	--codeclimate)
+	--code-climate)
 		send_to_codeclimate
 		;;
 esac
