@@ -9,6 +9,10 @@ jobs:
   build:
     docker:
       - image: newtonsystems/tools-docker-grpc-tools:0.2.1
+    environment:
+      TEST_REPORTS: /tmp/test-reports
+      COVERALLS_REPO_TOKEN: 8hXhaqC0aBuwUKkPUcoB2VRmehTsP4Mz1
+      CODECLIMATE_REPO_TOKEN: d25f67d317327459d14dca522099c332c71ecaa6344cef14b04445bbf4686e9c
     working_directory: ~/hello
     steps:
       - checkout
@@ -17,7 +21,18 @@ jobs:
       - run:
           name: Clone dev-utils repo (Development utility scripts/tools)
           command: |
+            cd ~/
             git clone -b $CIRCLE_BRANCH https://github.com/newtonsystems/dev-utils.git
+
+      - run:
+          name: Clone devops repo (Update the submodule to the latest change)
+          command: |
+            cd ~/
+            git clone -b $CIRCLE_BRANCH https://github.com/newtonsystems/devops.git
+            cd devops
+            git submodule sync
+            git submodule update --init
+            git submodule foreach git pull origin $CIRCLE_BRANCH
 
       - run:
           name: Run Regression Tests
@@ -37,17 +52,26 @@ jobs:
             fi
 
       - deploy:
+          name: Upload coverage results to coveralls and codeclimate from within docker
+          command: |
+            docker run hello:local coveralls
+            docker run hello:local CODECLIMATE_REPO_TOKEN=${CODECLIMATE_REPO_TOKEN} codeclimate-test-reporter
+
+      - deploy:
           name: Deploy python package to devpi 
           command: |
               # NOTE: At the moment even no changes are packaged up into
               #       a new python devpi package
-              cd python
-              ../.circleci/circle-upload-devpi.sh
+              ~/devops/scripts/circle-upload-devpi.sh
 
       - deploy:
-          name: Make and deploy sphinx documentation
+          name: Make and deploy sphinx documentation (after deployment of devpi - as changed version)
           command: |
               # NOTE: At the moment even no changes are packaged up into
               #       a new python devpi package
-              cd python
-              deploy_sphinx_docs.sh hello docs/build/html/
+              pushd docs; make html ; popd
+              ~/dev-utils/bin/deploy_sphinx_docs.sh libutils docs/build/html/
+
+      # Upload test results
+      - store_test_results:
+          path: /tmp/test-reports
