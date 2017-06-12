@@ -55,8 +55,8 @@ jobs:
       - deploy:
           name: Upload coverage results to coveralls and codeclimate from within docker
           command: |
-            docker run hello:local coveralls
-            docker run hello:local CODECLIMATE_REPO_TOKEN=${CODECLIMATE_REPO_TOKEN} codeclimate-test-reporter
+            docker run -e "COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN}" hello:local coveralls
+            docker run -e "CODECLIMATE_REPO_TOKEN=${CODECLIMATE_REPO_TOKEN}" hello:local codeclimate-test-reporter
 
       - deploy:
           name: Deploy python package to devpi 

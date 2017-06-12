@@ -393,7 +393,7 @@ stop:                        ##@local Stops all docker containers with tag: '$(R
 
 shell: build                 ##@local Run bash shell against the dockerized service 
 	@echo "$(INFO) Running lint tests against the docker container"
-	$(DOCKER_RUN_LOCAL_COMMAND) -it $(REPO):local /bin/bash
+	$(DOCKER_RUN_COMMAND) -it $(REPO):local /bin/bash
 
 remove: stop                 ##@local Stops and remove docker containers with tag: '$(REPO):local' and name '$(REPO)_local'
 	@if [ -n "`docker ps -a -q -f ancestor=$(REPO):local`" ]; then \
