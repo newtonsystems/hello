@@ -8,7 +8,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: newtonsystems/tools-docker-grpc-tools:0.2.0
+      - image: newtonsystems/tools-docker-grpc-tools:0.2.1
     working_directory: ~/hello
     steps:
       - checkout
