@@ -82,6 +82,25 @@ Other useful build commands
 
     make build-dm
 
+How to Run the Docker Image
+-----------------------------
+- Run the app latest production image (run black box)
+
+.. code:: bash
+
+    make run-latest-release
+    
+- Run the app latest image for that branch
+
+.. code:: bash
+
+    make run-latest
+    
+- Run the app locally (for development)
+
+.. code:: bash
+
+    make run
 
 Installation
 ------------
