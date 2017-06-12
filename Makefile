@@ -360,16 +360,19 @@ run-dm: build-dm             ##@local Builds and run docker container with tag: 
 	@eval $$(minikube docker-env); $(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
 	@echo "$(NO_COLOR)"
 
-build:                       ##@local Builds the local Dockerfile 
+build:                       ##@local Builds the local Dockerfile
+	mkdir -p wheelhouse 
 	@echo "$(INFO) Building the 'dev' Container locally with tag: $(REPO):local"
 	docker image build --build-arg APP_ENV=dev --build-arg PYPI_INDEX=$(CURRENT_BRANCH) -t $(REPO):local -f Dockerfile .
 	@echo ""
 
 build-debug:                   ##@local Builds the local Dockerfile.dev (Development Dockerfile (Not run in production)). Useful if you need to debug a container (Installs helpful tools)
+	mkdir -p wheelhouse 
 	@echo "$(WARN) Building the Container locally with tag: $(REPO):local using Development Dockerfile (Do not run unless you need to and know what you are doing)"
 	@docker image build -t $(REPO):local -f Dockerfile.dev .
 
 build-dm:                       ##@local Builds the local Dockerfile for docker-machine environment
+	mkdir -p wheelhouse 
 	@echo "$(INFO) Building the Container locally with tag: $(REPO):local"
 	@eval $$(minikube docker-env); docker image build --build-arg APP_ENV=dev -t $(REPO):local -f Dockerfile .
 
