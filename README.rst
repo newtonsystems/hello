@@ -54,6 +54,35 @@ For more detailed explanation please see "How to develop this app"
 
     make build
 
+Essentially the docker build does the following:
+    - copies app/ and setup.py
+    - copies any cached wheel files 
+    - run pip install against requirements file
+    - run a bash script (docker-entrypoint.sh) based on ENV_TYPE
+
+Other useful build commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Run docker build for a different environment e.g. test
+
+.. code:: bash
+
+    docker build -t <TAG_NAME> --build-arg APP_ENV=test .
+
+- Run a debug Dockerfile (for debugging a container - useful packages installed e.g. iPython, bash-completion etc.)
+`NOTE: only run this if you know what you are doing`
+
+.. code:: bash
+
+    make build-debug
+
+- Run a docker build against the docker-machine / minikube environment
+
+.. code:: bash
+
+    make build-dm
+
+
 Installation
 ------------
 Install via setuptools:
