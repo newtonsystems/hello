@@ -24,6 +24,11 @@ COPY config/bin /usr/local/bin/
 # Copy source code and setup.py to python package area
 COPY app $PYTHON_PACKAGE_LOCATION/hello/app
 COPY setup.py $PYTHON_PACKAGE_LOCATION/hello
+# Not really happy about this ... (not sure what to do about it)
+# We ideally dont want to copy files for production but rather just
+# use a binary ... not sure it is possible with one Dockerfile within
+# a if statement
+RUN pip install -e /usr/local/src/hello
 
 
 # 1. Copy pip requirements to BUILD_DIR

@@ -27,7 +27,7 @@ jobs:
             pip install sphinx
             pip install sphinx_rtd_theme
             pip install sphinx_git
-            pip install config/requirements/dev.txt --extra-index-url $DEVPI_SERVER/newtonsystems/$CIRCLE_BRANCH
+            pip install -r config/requirements/dev.txt --extra-index-url $DEVPI_SERVER/newtonsystems/$CIRCLE_BRANCH
 
       - run:
           name: Clone dev-utils repo (Development utility scripts/tools)

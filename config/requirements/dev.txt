@@ -9,4 +9,3 @@ python-coveralls
 codeclimate-test-reporter
 
 -e git+https://github.com/javaab/libutils.git#egg=libutils
--e /usr/local/src/hello
