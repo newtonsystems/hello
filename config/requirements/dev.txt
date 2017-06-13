@@ -4,7 +4,7 @@
 flake8
 pylint
 nose
-coverage=4.3.4
+coverage==4.3.4
 python-coveralls
 codeclimate-test-reporter
 
