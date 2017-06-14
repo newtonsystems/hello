@@ -14,7 +14,8 @@ jobs:
       DEVPI_SERVER: https://devpi.newtonsystems.co.uk
       TEST_REPORTS: /tmp/test-reports
       COVERALLS_REPO_TOKEN: 8hXhaqC0aBuwUKkPUcoB2VRmehTsP4Mz1
-      CODECLIMATE_REPO_TOKEN: d25f67d317327459d14dca522099c332c71ecaa6344cef14b04445bbf4686e9c
+      CODECLIMATE_REPO_TOKEN: 9b5bddb06418a3c448e2b90c01dbd8e5ac5971a0da4dcb5cc4484dd79691f60d
+      PYTHON_PACKAGE_LOCATION: ~/
     working_directory: ~/hello
     steps:
       - checkout
@@ -48,8 +49,10 @@ jobs:
       - run:
           name: Run Regression Tests (send test coverage to code climate)
           command: |
-            # Can't run make check FORCE_IGNORE_PREQ_TEST=true (docker volumes not supported)
-            make circleci-check CODECLIMATE_REPO_TOKEN=${CODECLIMATE_REPO_TOKEN} FORCE_IGNORE_PREQ_TEST=true
+            # Can't run make check FORCE_IGNORE_PREQ_TEST=true (docker volumes not supported + code climate needs git repo info)
+            ./config/run_test.sh --code-climate
+
+
 
       - run:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
