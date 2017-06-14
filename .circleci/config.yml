@@ -67,8 +67,7 @@ jobs:
       - deploy:
           name: Upload coverage results to coveralls from within docker
           command: |
-            docker build -t newtonsystems/$DOCKER_PROJECT_NAME:$CIRCLE_BRANCH .
-            docker run -e "COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN}" hello:local coveralls
+            docker run -e "COVERALLS_REPO_TOKEN=${COVERALLS_REPO_TOKEN}" newtonsystems/$DOCKER_PROJECT_NAME:$CIRCLE_BRANCH coveralls
  
       - deploy:
           name: Deploy python package to devpi 
