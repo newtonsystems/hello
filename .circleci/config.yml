@@ -50,9 +50,7 @@ jobs:
           name: Run Regression Tests (send test coverage to code climate)
           command: |
             # Can't run make check FORCE_IGNORE_PREQ_TEST=true (docker volumes not supported + code climate needs git repo info)
-            ./config/bin/run_test.sh --code-climate
-
-
+            ./config/bin/run_tests.sh --code-climate
 
       - run:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
