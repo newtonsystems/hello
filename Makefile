@@ -80,11 +80,11 @@ HELP_FUN = \
 # Basic Prerequisite tests
 #
 FORCE_IGNORE_PREQ_TEST=false
-uname2     :=$(shell /bin/bash -c "check-setup.sh")
+checks     :=$(shell /bin/bash -c "check-setup.sh")
 ifeq ($(FORCE_IGNORE_PREQ_TEST), false)
 
     ifneq ($(shell /bin/bash -c "check-setup.sh"; echo $$?), 0)
-        $(error $(uname2))
+        $(error $(checks))
     endif
 
 endif
