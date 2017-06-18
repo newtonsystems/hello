@@ -110,6 +110,12 @@ jobs:
       - setup_remote_docker
 
       - run:
+          name: Clone dev-utils repo (Development utility scripts/tools)
+          command: |
+            cd ~/
+            git clone -b master https://github.com/newtonsystems/dev-utils.git
+
+      - run:
           name: Clone devops repo (Update the submodule to the latest change)
           command: |
             cd ~/
@@ -119,7 +125,7 @@ jobs:
             git submodule update --init
             git submodule foreach git pull origin $CIRCLE_BRANCH
 
-      - run:
+      - run: 
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
           command: |
             TIMESTAMP=tmp-$(date +%s)
