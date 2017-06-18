@@ -111,6 +111,7 @@ jobs:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
           command: |
             TIMESTAMP=tmp-$(date +%s)
+            mkdir -p wheelhouse # need to fix this (should really need to do this)
             docker image build -t $DOCKER_PROJECT_NAME:$TIMESTAMP .
             kubectl set image -f ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$DOCKER_PROJECT_NAME.yaml hello=$DOCKER_PROJECT_NAME:$TIMESTAMP
             #wait-for-it.sh -t 60 localhost:50000
