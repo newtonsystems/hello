@@ -112,7 +112,7 @@ jobs:
       - run:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
           command: |
-            TIMESTAMP=tmp-$(shell date +%s )
+            TIMESTAMP=tmp-$(date +%s )
             docker image build -t $(REPO):$(TIMESTAMP) .
             kubectl set image -f ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(REPO).yaml hello=$(REPO):$(TIMESTAMP)
             #wait-for-it.sh -t 60 localhost:50000
