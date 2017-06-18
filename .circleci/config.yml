@@ -58,6 +58,7 @@ jobs:
           command: |
             # Can't run make check FORCE_IGNORE_PREQ_TEST=true (docker volumes not supported + code climate needs git repo info)
             ./config/bin/run_tests.sh --code-climate
+            mkdir -p $TEST_REPORTS
             cp nosetests.xml $TEST_REPORTS/nosetests.xml
 
       - run:
