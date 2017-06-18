@@ -97,10 +97,23 @@ jobs:
 
 
   deploy_kubernetes_featuretest:
+    docker:
+      - image: newtonsystems/tools-docker-grpc-tools:0.2.2
+    environment:
+      DOCKER_PROJECT_NAME: hello
+      DEVPI_SERVER: https://devpi.newtonsystems.co.uk
+      TEST_REPORTS: /tmp/test-reports
+      COVERALLS_REPO_TOKEN: 8hXhaqC0aBuwUKkPUcoB2VRmehTsP4Mz1
+      CODECLIMATE_REPO_TOKEN: 9b5bddb06418a3c448e2b90c01dbd8e5ac5971a0da4dcb5cc4484dd79691f60d
+      PYTHON_PACKAGE_LOCATION: ~/
+      KUBECONFIG: ~/dev-utils/config/k8s/kube.config
+    working_directory: ~/hello
     steps:
       - run:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
           command: |
+            TIMESTAMP=tmp-$(shell date +%s )
+            docker image build -t $(REPO):$(TIMESTAMP) .
             kubectl set image -f ~/devops/k8s/deploy/featuretest/$(REPO).yaml hello=$(REPO):$(TIMESTAMP)
             #wait-for-it.sh -t 60 localhost:50000
             #if [ $? -ne 0 ]; then
