@@ -35,13 +35,13 @@ jobs:
           name: Clone docker-utils repo
           command: |
             cd ~/
-            git clone -b $CIRCLE_BRANCH git@github.com:newtonsystems/docker-utils.git
+            git clone -b master git@github.com:newtonsystems/docker-utils.git
 
       - run:
           name: Clone dev-utils repo (Development utility scripts/tools)
           command: |
             cd ~/
-            git clone -b $CIRCLE_BRANCH https://github.com/newtonsystems/dev-utils.git
+            git clone -b master https://github.com/newtonsystems/dev-utils.git
 
       - run:
           name: Clone devops repo (Update the submodule to the latest change)
@@ -114,12 +114,12 @@ jobs:
           command: |
             TIMESTAMP=tmp-$(shell date +%s )
             docker image build -t $(REPO):$(TIMESTAMP) .
-            kubectl set image -f ~/devops/k8s/deploy/featuretest/$(REPO).yaml hello=$(REPO):$(TIMESTAMP)
+            kubectl set image -f ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(REPO).yaml hello=$(REPO):$(TIMESTAMP)
             #wait-for-it.sh -t 60 localhost:50000
             #if [ $? -ne 0 ]; then
-            #    kubectl rollout status ~/devops/k8s/deploy/featuretest/$(REPO).yaml --watch=false
+            #    kubectl rollout status ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(REPO).yaml --watch=false
             #    echo -e "Cannot connect to server on port 50000. Will undo rollout of kubernetes image ..."
-            #    kubectl rollout undo ~/devops/k8s/deploy/featuretest/$(REPO).yaml
+            #    kubectl rollout undo ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(REPO).yaml
             #    exit 1
             #fi
 
@@ -128,9 +128,11 @@ workflows:
   dev_stage_featuretest:
     jobs:
       - build
-      - deploy_kubernetes_featuretest:
+      - deploy_kubernetes_branch:
           filters:
             branches:
-              only: featuretest
+              only: 
+                - featuretest
+                - master
           requires:
             - build
