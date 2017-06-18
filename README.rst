@@ -166,3 +166,47 @@ Run all other services to minikube + locally run docker container (hot-reloaded 
     make run
 
 
+DEBUG MODE
+----------
+As mentioned before we have a useful mode for debugging docker containers. This is especially useful if you need to ssh into the container.
+
+- This mode uses `Dockerfile.dev`
+- Dockerfile.dev calls debug.txt from config/requirements which will include useful debugging python packages
+
+.. code:: bash
+
+    make build-debug
+    make run
+
+If you have docker-utils in your path you can then ssh into the most recent container 
+
+.. code:: bash
+
+    docker-into-most-recent-container
+
+How to do a release
+===================
+
+- Make sure you are using docker-utils 
+i.e.
+
+.. code:: bash
+
+    export PATH="~/<LOCATION>/docker-utils/bin:$PATH"
+
+.. code:: bash
+
+    build-tag-push-dockerfile.py  --image "newtonsystems/hello" --version 0.1.0 --dockerhub_release --github_release
+
+User Feedback
+-------------
+
+Any feedback or comments  would be greatly appreciated: <james.tarball@newtonsystems.co.uk>
+
+
+Issues
+------
+
+If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/newtonsystems/hello/issues).
+
+You can also reach me by email. I would be happy to help  <james.tarball@newtonsystems.co.uk>
