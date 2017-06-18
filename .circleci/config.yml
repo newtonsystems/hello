@@ -8,7 +8,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: newtonsystems/tools-docker-grpc-tools:0.2.1
+      - image: newtonsystems/tools-docker-grpc-tools:0.2.2
     environment:
       DOCKER_PROJECT_NAME: hello
       DEVPI_SERVER: https://devpi.newtonsystems.co.uk
@@ -16,6 +16,7 @@ jobs:
       COVERALLS_REPO_TOKEN: 8hXhaqC0aBuwUKkPUcoB2VRmehTsP4Mz1
       CODECLIMATE_REPO_TOKEN: 9b5bddb06418a3c448e2b90c01dbd8e5ac5971a0da4dcb5cc4484dd79691f60d
       PYTHON_PACKAGE_LOCATION: ~/
+      KUBECONFIG: ~/dev-utils/config/k8s/kube.config
     working_directory: ~/hello
     steps:
       - checkout
@@ -29,6 +30,12 @@ jobs:
             pip install sphinx_rtd_theme
             pip install sphinx_git
             pip install -r config/requirements/dev.txt --extra-index-url $DEVPI_SERVER/newtonsystems/$CIRCLE_BRANCH
+
+      - run:
+          name: Clone docker-utils repo
+          command: |
+            cd ~/
+            git clone -b $CIRCLE_BRANCH git@github.com:newtonsystems/docker-utils.git
 
       - run:
           name: Clone dev-utils repo (Development utility scripts/tools)
@@ -87,3 +94,29 @@ jobs:
       # Upload test results
       - store_test_results:
           path: /tmp/test-reports
+
+
+  deploy_kubernetes_featuretest:
+    steps:
+      - run:
+          name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
+          command: |
+          kubectl set image -f ~/devops/k8s/deploy/featuretest/$(REPO).yaml hello=$(REPO):$(TIMESTAMP)
+          #wait-for-it.sh -t 60 localhost:50000
+          #if [ $? -ne 0 ]; then
+          #    kubectl rollout status ~/devops/k8s/deploy/featuretest/$(REPO).yaml --watch=false
+          #    echo -e "Cannot connect to server on port 50000. Will undo rollout of kubernetes image ..."
+          #    kubectl rollout undo ~/devops/k8s/deploy/featuretest/$(REPO).yaml
+          #    exit 1
+          #fi
+
+workflows:
+  version: 2
+  dev_stage_featuretest:
+    jobs:
+      - deploy_kubernetes_featuretest:
+          filters:
+            branches:
+              only: featuretest
+          requires:
+            - build

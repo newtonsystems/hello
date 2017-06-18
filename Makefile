@@ -80,21 +80,11 @@ HELP_FUN = \
 # Basic Prerequisite tests
 #
 FORCE_IGNORE_PREQ_TEST=false
-
+uname2     :=$(shell /bin/bash -c "check-setup.sh")
 ifeq ($(FORCE_IGNORE_PREQ_TEST), false)
 
-    # Basic Prerequisite test: Is docker running?
-    ifneq ('$(shell docker --version)', 'Docker version 17.03.1-ce, build c6d412e') 
-        $(error Docker is not running. Please run start docker.)
-    endif 
-
-    # Basic Prerequisite test: Is Minikube running?
-    ifneq ('$(shell minikube status | grep minikubeVM)', 'minikubeVM: Running')
-        $(error Minikube is not running. Please run 'minikube start'.)
-    endif
-
-    ifneq ('$(shell nghttpx -v)', 'nghttpx nghttp2/1.23.1')
-        $(error nghttpx is not current installed or is a different version.)
+    ifneq ($(shell /bin/bash -c "check-setup.sh"; echo $$?), 0)
+        $(error $(uname2))
     endif
 
 endif
@@ -181,8 +171,16 @@ kube-clean:                       ##@cleanup Cleans Up Kubernetes Environment. D
 .PHONY: infra-recreate infra-create infra-delete
 
 ADMIN_PORT=`kubectl get svc linkerd -o jsonpath='{.spec.ports[?(@.name=="admin")].nodePort}'`
+NAMERD_PORT=`kubectl get svc namerd -o jsonpath='{.spec.ports[?(@.name=="http")].nodePort}'`
 PING_ADMIN=http://`minikube ip`:$(ADMIN_PORT)/admin/ping
 LINKERVIZ_PORT=`kubectl get svc linkerd-viz -o jsonpath='{.spec.ports[?(@.name=="grafana")].nodePort}'`
+NAMERCTL_BASE_URL = http://`minikube ip`:$(NAMERD_PORT)
+
+
+infra-set-environment:
+	@echo "Set up namerd env NAMERCTL_BASE_URL so you can use namerctl"
+	set NAMERCTL_BASE_URL="FSS"
+	@echo export NAMERCTL_BASE_URL=$(NAMERCTL_BASE_URL)
 
 
 infra-recreate:              ##@infrastructure Recreates all critical infrastructure components to run with your service (via minikube/k8s)
@@ -229,6 +227,10 @@ infra-linkerd-logs:     ##@infra-linkerd-logs Tails linkerd logs
 	@echo "$(INFO) Attaching to service $(BLUE)$(LINKERD_POD_NAME)$(RESET) logs"
 	kubectl logs -f --tail=50 $(LINKERD_POD_NAME) linkerd
 
+infra-namerd-logs:     ##@infra-namerd-logs Tails namerd logs
+	@echo "$(INFO) Attaching to service $(BLUE)$(NAMERD_POD_NAME)$(RESET) logs"
+	kubectl logs -f --tail=50 $(NAMERD_POD_NAME) namerd
+
 
 #
 # Build Service Locally + Deploy as a pod/service in minikube
@@ -237,6 +239,7 @@ infra-linkerd-logs:     ##@infra-linkerd-logs Tails linkerd logs
 
 POD_NAME=`kubectl get pods -o wide | grep $(PROJECT_NAME) | grep Running | cut -d ' ' -f1`
 LINKERD_POD_NAME=`kubectl get pods -o go-template='{{range .items}}{{if eq .status.phase "Running"}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | grep linkerd | grep -v linkerd-viz`
+NAMERD_POD_NAME=`kubectl get pods -o go-template='{{range .items}}{{if eq .status.phase "Running"}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | grep namerd`
 POD_PORT=`kubectl get svc $(PROJECT_NAME) -o jsonpath='{.spec.ports[?(@)].nodePort}'`
 
 
@@ -310,10 +313,10 @@ DOCKER_RUN_COMMAND=docker run \
 
 # This is local run command with added volume capability
 #--net mynet123 --ip 172.20.18.22
-DOCKER_RUN_LOCAL_COMMAND=docker run --rm -it  \
+DOCKER_RUN_LOCAL_COMMAND=docker run -it  \
 	-p 50000:50000 \
 	-e "L5D_PORT_4141_TCP=$(LINKERD_SERVICE_PORT)" \
-	--name $(REPO)_local \
+	#--name $(REPO)_local \
 	-v ${PWD}/app:/usr/local/src/hello/app #\
 	#-v ${PWD}../../libutils:/usr/local/src/libutils \
 	#-v ${PWD}./wheelhouse:/wheelhouse
@@ -453,5 +456,8 @@ nghttpx:
 # Deploy (in-staging testing)
 #
 
-deploy-cloud:                ##@local-deploy Deploy service to cloud environment (for in staging testing)
+deploy-cloud-dev:                ##@local-deploy Deploy service to cloud environment (for in staging testing)
 	@echo "Not implemented yet ... sorry boss"
+	kubectl config set-context dev 
+	kubectl sjkjfdsjflkds
+	kubectl config set-context minikube
