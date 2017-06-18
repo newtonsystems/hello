@@ -8,7 +8,7 @@
 |
 
 master
-------
+
 .. image:: https://circleci.com/gh/newtonsystems/hello/tree/master.svg?style=shield
      :target: https://circleci.com/gh/newtonsystems/hello/tree/master
 
@@ -19,11 +19,11 @@ master
      :target: https://coveralls.io/github/newtonsystems/hello
 
 .. image:: https://codeclimate.com/github/newtonsystems/hello/badges/gpa.svg
-   :target: https://codeclimate.com/github/newtonsystems/hello
-   :alt: Code Climate Badge
+     :target: https://codeclimate.com/github/newtonsystems/hello
+     :alt: Code Climate Badge
 
 featuretest
-------
+
 .. image:: https://circleci.com/gh/newtonsystems/hello/tree/featuretest.svg?style=shield
      :target: https://circleci.com/gh/newtonsysyems/hello/tree/featuretest
 
