@@ -104,6 +104,9 @@ jobs:
       KUBECONFIG: ~/dev-utils/config/k8s/kube.config
     working_directory: ~/hello
     steps:
+      - checkout
+      - setup_remote_docker
+
       - run:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
           command: |
