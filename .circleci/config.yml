@@ -113,12 +113,13 @@ jobs:
             TIMESTAMP=tmp-$(date +%s)
             mkdir -p wheelhouse # need to fix this (should really need to do this)
             docker image build -t $DOCKER_PROJECT_NAME:$TIMESTAMP .
-            kubectl set image -f ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$DOCKER_PROJECT_NAME-deployment.yaml hello=$DOCKER_PROJECT_NAME:$TIMESTAMP
+            kubectl set image -f ~/devops/k8s/deploy/$CIRCLE_BRANCH/$DOCKER_PROJECT_NAME-deployment.yaml hello=$DOCKER_PROJECT_NAME:$TIMESTAMP
+
             #wait-for-it.sh -t 60 localhost:50000
             #if [ $? -ne 0 ]; then
-            #    kubectl rollout status ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$DOCKER_PROJECT_NAME-deployment.yaml --watch=false
+            #    kubectl rollout status ~/devops/k8s/deploy/$CIRCLE_BRANCH/$DOCKER_PROJECT_NAME-deployment.yaml --watch=false
             #    echo -e "Cannot connect to server on port 50000. Will undo rollout of kubernetes image ..."
-            #    kubectl rollout undo ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$DOCKER_PROJECT_NAME-deployment.yaml
+            #    kubectl rollout undo ~/devops/k8s/deploy/$CIRCLE_BRANCH/$DOCKER_PROJECT_NAME-deployment.yaml
             #    exit 1
             #fi
 
