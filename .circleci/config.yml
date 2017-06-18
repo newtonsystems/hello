@@ -101,14 +101,14 @@ jobs:
       - run:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
           command: |
-          kubectl set image -f ~/devops/k8s/deploy/featuretest/$(REPO).yaml hello=$(REPO):$(TIMESTAMP)
-          #wait-for-it.sh -t 60 localhost:50000
-          #if [ $? -ne 0 ]; then
-          #    kubectl rollout status ~/devops/k8s/deploy/featuretest/$(REPO).yaml --watch=false
-          #    echo -e "Cannot connect to server on port 50000. Will undo rollout of kubernetes image ..."
-          #    kubectl rollout undo ~/devops/k8s/deploy/featuretest/$(REPO).yaml
-          #    exit 1
-          #fi
+            kubectl set image -f ~/devops/k8s/deploy/featuretest/$(REPO).yaml hello=$(REPO):$(TIMESTAMP)
+            #wait-for-it.sh -t 60 localhost:50000
+            #if [ $? -ne 0 ]; then
+            #    kubectl rollout status ~/devops/k8s/deploy/featuretest/$(REPO).yaml --watch=false
+            #    echo -e "Cannot connect to server on port 50000. Will undo rollout of kubernetes image ..."
+            #    kubectl rollout undo ~/devops/k8s/deploy/featuretest/$(REPO).yaml
+            #    exit 1
+            #fi
 
 workflows:
   version: 2
