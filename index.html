@@ -277,6 +277,9 @@ For more detailed explanation please see “How to develop this app”</p>
 </ol>
 </div></blockquote>
 <p>1 + 3 are the normal development workflow. Hot-reloaded does NOT run in 2.</p>
+</div>
+<div class="section" id="develop-deploy-to-minikube">
+<h2>Develop &amp; Deploy to minikube<a class="headerlink" href="#develop-deploy-to-minikube" title="Permalink to this headline">¶</a></h2>
 <p>Run the infrastructure services (and any other services) then deploy app to minikube.
 Make changes and update the image using kubernetes.</p>
 <div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">infra</span><span class="o">-</span><span class="n">create</span>
@@ -285,6 +288,9 @@ Make changes and update the image using kubernetes.</p>
 <span class="n">make</span> <span class="n">kube</span><span class="o">-</span><span class="n">update</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="run-all-other-services-to-minikube-minikube-docker-environment-locally-run-docker-container-n">
+<h2>Run all other services to minikube + minikube docker environment locally run docker container (N)<a class="headerlink" href="#run-all-other-services-to-minikube-minikube-docker-environment-locally-run-docker-container-n" title="Permalink to this headline">¶</a></h2>
 <div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">infra</span><span class="o">-</span><span class="n">create</span>
 <span class="n">make</span> <span class="n">build</span><span class="o">-</span><span class="n">dm</span>
 <span class="n">make</span> <span class="n">run</span><span class="o">-</span><span class="n">dm</span> <span class="p">(</span><span class="n">You</span> <span class="n">must</span> <span class="n">use</span> <span class="n">incoming</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="n">workflow</span><span class="o">-</span><span class="mi">1</span> <span class="n">to</span> <span class="n">connect</span> <span class="n">external</span> <span class="n">to</span> <span class="n">services</span><span class="p">)</span>
@@ -292,6 +298,9 @@ Make changes and update the image using kubernetes.</p>
 <span class="n">make</span> <span class="n">run</span><span class="o">-</span><span class="n">dm</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="run-all-other-services-to-minikube-locally-run-docker-container-hot-reloaded-capable">
+<h2>Run all other services to minikube + locally run docker container (hot-reloaded capable)<a class="headerlink" href="#run-all-other-services-to-minikube-locally-run-docker-container-hot-reloaded-capable" title="Permalink to this headline">¶</a></h2>
 <div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">infra</span><span class="o">-</span><span class="n">create</span>
 <span class="n">make</span> <span class="n">run</span> <span class="p">(</span><span class="n">You</span> <span class="n">must</span> <span class="n">use</span> <span class="n">incoming</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="n">workflow</span><span class="o">-</span><span class="mi">2</span> <span class="n">to</span> <span class="n">connect</span> <span class="n">external</span> <span class="n">to</span> <span class="n">services</span><span class="p">)</span>
 <span class="c1">## ctrl+c (stop running container) then make some dev changes ##</span>
