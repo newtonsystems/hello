@@ -114,6 +114,7 @@ workflows:
   version: 2
   dev_stage_featuretest:
     jobs:
+      - build
       - deploy_kubernetes_featuretest:
           filters:
             branches:
