@@ -96,7 +96,7 @@ jobs:
           path: /tmp/test-reports
 
 
-  deploy_kubernetes_featuretest:
+  deploy_kubernetes_branch:
     docker:
       - image: newtonsystems/tools-docker-grpc-tools:0.2.2
     environment:
