@@ -3,8 +3,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    run: hello
-  name: hello
+    run: hello-tmp
+  name: hello-tmp
 spec:
   ports:
   - name: grpc
@@ -12,5 +12,5 @@ spec:
     protocol: TCP
     targetPort: 50000
   selector:
-    run: hello
+    run: hello-tmp
   type: NodePort
