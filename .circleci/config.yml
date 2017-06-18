@@ -134,7 +134,7 @@ jobs:
             TIMESTAMP=tmp-$(date +%s)
             mkdir -p wheelhouse # need to fix this (should really need to do this)
             docker image build -t $DOCKER_PROJECT_NAME:$TIMESTAMP .
-            kubectl set image -f ~/devops/k8s/deploy/$CIRCLE_BRANCH/$DOCKER_PROJECT_NAME-deployment.yaml hello=$DOCKER_PROJECT_NAME:$TIMESTAMP
+            kubectl set image -n $CIRCLE_BRANCH -f ~/devops/k8s/deploy/$CIRCLE_BRANCH/$DOCKER_PROJECT_NAME-deployment.yaml hello=$DOCKER_PROJECT_NAME:$TIMESTAMP
             sleep 60
             #wait-for-it.sh -t 60 localhost:50000
             #if [ $? -ne 0 ]; then
