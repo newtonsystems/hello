@@ -128,6 +128,7 @@ jobs:
       - run: 
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
           command: |
+            mv $KUBECONFIG $HOME/.kube/config
             TIMESTAMP=tmp-$(date +%s)
             mkdir -p wheelhouse # need to fix this (should really need to do this)
             docker image build -t $DOCKER_PROJECT_NAME:$TIMESTAMP .
