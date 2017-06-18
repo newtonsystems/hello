@@ -1,6 +1,11 @@
 app package
 ===========
 
+.. automodule:: app
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Subpackages
 -----------
 
@@ -13,8 +18,8 @@ Subpackages
 Submodules
 ----------
 
-app.service module
-------------------
+app\.service module
+-------------------
 
 .. automodule:: app.service
     :members:
@@ -22,10 +27,3 @@ app.service module
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: app
-    :members:
-    :undoc-members:
-    :show-inheritance:

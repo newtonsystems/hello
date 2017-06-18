@@ -13,6 +13,8 @@
 
   
   
+  
+  
 
   
 
@@ -30,6 +32,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
     <link rel="top" title="hello 0.1.0 documentation" href="index.html"/>
         <link rel="up" title="app package" href="app.html"/>
         <link rel="next" title="Requirements" href="requirements.html"/>
@@ -42,6 +47,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -82,7 +88,10 @@
           
             
             
-                <ul class="current">
+              
+            
+            
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="features.html">Features</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="app.html">app package</a><ul class="current">
@@ -92,22 +101,12 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">app.tests package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-app.tests.test_main">app.tests.test_main module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-app.tests">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="app.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="app.html#module-app.service">app.service module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="app.html#module-app">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="app.client.html">app.client package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="app.iface.html">app.iface package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">app.tests package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-app.tests.test_main">app.tests.test_main module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-app.tests">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="requirements.html">Requirements</a></li>
@@ -123,8 +122,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">hello</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hello</a>
+        
       </nav>
 
 
@@ -133,32 +134,57 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
           <li><a href="app.html">app package</a> &raquo;</li>
-      
-    <li>app.tests package</li>
+        
+      <li>app.tests package</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
-            <a href="_sources/app.tests.txt" rel="nofollow"> View page source</a>
+            
+            <a href="_sources/app.tests.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="app-tests-package">
-<h1>app.tests package<a class="headerlink" href="#app-tests-package" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-app.tests">
+<span id="app-tests-package"></span><h1>app.tests package<a class="headerlink" href="#module-app.tests" title="Permalink to this headline">¶</a></h1>
+<p>Unit Tests for service hello</p>
+<dl class="docutils">
+<dt>How to run:</dt>
+<dd>From the project’s root directory</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">make</span> <span class="n">check</span>
+</pre></div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -166,32 +192,34 @@
 <span id="app-tests-test-main-module"></span><h2>app.tests.test_main module<a class="headerlink" href="#module-app.tests.test_main" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="app.tests.test_main.TestMain">
-<em class="property">class </em><code class="descclassname">app.tests.test_main.</code><code class="descname">TestMain</code><span class="sig-paren">(</span><em>methodName='runTest'</em><span class="sig-paren">)</span><a class="headerlink" href="#app.tests.test_main.TestMain" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">app.tests.test_main.</code><code class="descname">TestMain</code><span class="sig-paren">(</span><em>methodName=’runTest’</em><span class="sig-paren">)</span><a class="headerlink" href="#app.tests.test_main.TestMain" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Main TestCase for service hello.</p>
 <dl class="method">
 <dt id="app.tests.test_main.TestMain.test_ok">
 <code class="descname">test_ok</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#app.tests.test_main.TestMain.test_ok" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Tests whether ok.</p>
+</dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-app.tests">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-app.tests" title="Permalink to this headline">¶</a></h2>
-</div>
 </div>
 
 
+           </div>
+           <div class="articleComments">
+            
            </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="requirements.html" class="btn btn-neutral float-right" title="Requirements" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="requirements.html" class="btn btn-neutral float-right" title="Requirements" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="app.iface.html" class="btn btn-neutral" title="app.iface package" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="app.iface.html" class="btn btn-neutral" title="app.iface package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -225,7 +253,8 @@
             VERSION:'0.1.0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
