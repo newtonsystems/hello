@@ -130,7 +130,7 @@ There are three possible ways to develop this app:
 1 + 3 are the normal development workflow. Hot-reloaded does NOT run in 2.
 
 Develop & Deploy to minikube
-````````````````````````````
+----------------------------
 
 Run the infrastructure services (and any other services) then deploy app to minikube.
 Make changes and update the image using kubernetes.
@@ -144,7 +144,7 @@ Make changes and update the image using kubernetes.
     make kube-update
 
 Run all other services to minikube + minikube docker environment locally run docker container (N)
-`````````````````````````````````````````````````````````````````````````````````````````````
+-------------------------------------------------------------------------------------------------
 
 .. code:: bash
 
@@ -155,7 +155,7 @@ Run all other services to minikube + minikube docker environment locally run doc
     make run-dm
 
 Run all other services to minikube + locally run docker container (hot-reloaded capable)
-```````````````````````````````````````````````````````````````````````````````````````
+----------------------------------------------------------------------------------------
 
 .. code:: bash
 
