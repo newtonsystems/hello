@@ -108,13 +108,23 @@ jobs:
       - setup_remote_docker
 
       - run:
+          name: Clone devops repo (Update the submodule to the latest change)
+          command: |
+            cd ~/
+            git clone -b $CIRCLE_BRANCH https://github.com/newtonsystems/devops.git
+            cd devops
+            git submodule sync
+            git submodule update --init
+            git submodule foreach git pull origin $CIRCLE_BRANCH
+
+      - run:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
           command: |
             TIMESTAMP=tmp-$(date +%s)
             mkdir -p wheelhouse # need to fix this (should really need to do this)
             docker image build -t $DOCKER_PROJECT_NAME:$TIMESTAMP .
             kubectl set image -f ~/devops/k8s/deploy/$CIRCLE_BRANCH/$DOCKER_PROJECT_NAME-deployment.yaml hello=$DOCKER_PROJECT_NAME:$TIMESTAMP
-
+            sleep 60
             #wait-for-it.sh -t 60 localhost:50000
             #if [ $? -ne 0 ]; then
             #    kubectl rollout status ~/devops/k8s/deploy/$CIRCLE_BRANCH/$DOCKER_PROJECT_NAME-deployment.yaml --watch=false
