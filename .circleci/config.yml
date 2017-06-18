@@ -100,7 +100,7 @@ jobs:
     docker:
       - image: newtonsystems/tools-docker-grpc-tools:0.2.2
     environment:
-      DEVPI_SERVER: https://devpi.newtonsystems.co.uk
+      DOCKER_PROJECT_NAME: hello
       KUBECONFIG: ~/dev-utils/config/k8s/kube.config
     working_directory: ~/hello
     steps:
@@ -108,13 +108,13 @@ jobs:
           name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
           command: |
             TIMESTAMP=tmp-$(date +%s )
-            docker image build -t $(REPO):$(TIMESTAMP) .
-            kubectl set image -f ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(CIRCLE_PROJECT_REPONAME).yaml hello=$(CIRCLE_PROJECT_REPONAME):$(TIMESTAMP)
+            docker image build -t $(DOCKER_PROJECT_NAME):$(TIMESTAMP) .
+            kubectl set image -f ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(DOCKER_PROJECT_NAME).yaml hello=$(DOCKER_PROJECT_NAME):$(TIMESTAMP)
             #wait-for-it.sh -t 60 localhost:50000
             #if [ $? -ne 0 ]; then
-            #    kubectl rollout status ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(CIRCLE_PROJECT_REPONAME).yaml --watch=false
+            #    kubectl rollout status ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(DOCKER_PROJECT_NAME).yaml --watch=false
             #    echo -e "Cannot connect to server on port 50000. Will undo rollout of kubernetes image ..."
-            #    kubectl rollout undo ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(CIRCLE_PROJECT_REPONAME).yaml
+            #    kubectl rollout undo ~/devops/k8s/deploy/$(CIRCLE_BRANCH)/$(DOCKER_PROJECT_NAME).yaml
             #    exit 1
             #fi
 
