@@ -207,6 +207,42 @@ i.e.
 
     build-tag-push-dockerfile.py  --image "newtonsystems/hello" --version 0.1.0 --dockerhub_release --github_release
 
+
+Future
+--------
+
+Use mount points with minikube (At the moment this is not possible to use effectively as inotify doesnt work with docker-machine)
+
+.. code:: bash
+
+    POD_NAME=`kubectl get pods -o wide | grep $(PROJECT_NAME) | grep Running | cut -d ' ' -f1`
+    LINKERD_POD_NAME=`kubectl get pods -o go-template='{{range .items}}{{if eq .status.phase "Running"}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | grep linkerd | grep -v linkerd-viz`
+    NAMERD_POD_NAME=`kubectl get pods -o go-template='{{range .items}}{{if eq .status.phase "Running"}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | grep namerd`
+    POD_PORT=`kubectl get svc $(PROJECT_NAME) -o jsonpath='{.spec.ports[?(@)].nodePort}'`
+
+    # kube-mount:                                          ##@kube Creates mounts for minikube
+    #   @echo "$(INFO) Setting up kubernetes mounts at $(BLUE).minikube-mounts/$(PROJECT_NAME)$(RESET)"
+    #   @mkdir -p .minikube-mounts/$(PROJECT_NAME)
+    #   @echo "$(WARN) Remember to add to k8s/deploy/deployment.yaml as well!"
+    #   @-ln -s \
+    #       ${PWD}/app \
+    #       ${PWD}/../libutils/libutils \
+    #   .minikube-mounts/$(PROJECT_NAME)
+    #   @echo "$(INFO) $(BLUE)Creating the following symlinks:$(RESET)"
+    #   @ls -ltra .minikube-mounts/$(PROJECT_NAME) | grep '\->'
+
+    # kube-create: kube-mount build                  ##@kube Create service and deploy to minikube
+    #   @echo "$(INFO) Building docker image: $(BLUE)hello:local$(RESET) and deploying to minikube."
+    #   kubectl create -f k8s/deploy/
+
+    #   @echo "$(INFO) Wait for service to be ready"
+    #   ./wait-for-it.sh -h `minikube ip` -p $(POD_PORT) -t 10
+
+    #   @echo "$(INFO) Attaching to service logs"
+    #   @make kube-logs
+
+
+
 User Feedback
 -------------
 

@@ -5,7 +5,7 @@
 # Please README.md for how to run this Docker Container
 #
 #
-FROM newtonsystems/docker-python-grpc-service-base:0.1.1
+FROM newtonsystems/docker-python-grpc-service-base:0.1.2
 
 # -------------------------------------------------------------------------- #
 
@@ -35,22 +35,22 @@ RUN pip install -e /usr/local/src/hello
 # 2. Install requirements based on environment type (development / production etc)
 #    Install with:
 #            - wheelhouse support (for fast caching)
-#            - pypi index to branch specific (newtonsystems/<index>)
+#            - pypi index to branch specific (jtarball/<index>)
 
 # Copy .whl files and pip requirements to BUILD_DIR
 COPY config/requirements $BUILD_DIR/requirements
 COPY wheelhouse/ $BUILD_DIR/wheelhouse
 
 # Build a directory of wheels for pyramid and all its dependencies
-RUN pip wheel -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
-    --extra-index-url $DEVPI_SERVER/newtonsystems/$PYPI_INDEX \
+RUN pip wheel --pre -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
+    --extra-index-url $DEVPI_SERVER/jtarball/$PYPI_INDEX \
     --trusted-host $DEVPI_SERVER \
     --find-links=$BUILD_DIR/wheelhouse \
     --wheel-dir=$BUILD_DIR/wheelhouse
 
 # Install from cached wheels (install editables to PYTHON_PACKAGE_LOCATION)
-RUN pip install --use-wheel -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
-    --extra-index-url $DEVPI_SERVER/newtonsystems/$PYPI_INDEX \
+RUN pip install --upgrade --use-wheel -r $BUILD_DIR/requirements/$ENV_TYPE.txt \
+    --extra-index-url $DEVPI_SERVER/jtarball/$PYPI_INDEX \
     --trusted-host $DEVPI_SERVER \
     --find-links=$BUILD_DIR/wheelhouse \
     --src $PYTHON_PACKAGE_LOCATION

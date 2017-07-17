@@ -14,15 +14,13 @@ from libutils import log_util
 
 log = log_util.get_logger(__name__)
 
-if os.environ.get("L5D_PORT_4141_TCP") is None:
-    log.error("The env L5D_PORT_4141_TCP has not been set. Communicate with linkerd will fail ...")
-
-LINKERD_INGRESS = os.environ.get("L5D_PORT_4141_TCP")
-
-log.info("Connecting to world service via linkerd: %s", LINKERD_INGRESS)
-channel = grpc.insecure_channel('172.17.0.2:4141')
-#channel = grpc.insecure_channel(LINKERD_INGRESS)
-stub = world_pb2_grpc.WorldStub(channel)
+if os.environ.get("LINKERD_PORT_4141_TCP") is None:
+    log.error("The env LINKERD_PORT_4141_TCP has not been set. Communicate with linkerd will fail ...")
+else:
+    LINKERD_INGRESS = os.environ.get("LINKERD_PORT_4141_TCP")
+    log.info("Connecting to world service via linkerd: %s", LINKERD_INGRESS)
+    channel = grpc.insecure_channel(LINKERD_INGRESS)
+    stub = world_pb2_grpc.WorldStub(channel)
 
 
 def sayWorld(name):

@@ -14,7 +14,7 @@ from argparse import RawTextHelpFormatter
 import grpc
 
 from libutils import log_util
-from grpc_types import hello_pb2, hello_pb2_grpc
+from grpc_types import hello_pb2, globalapi_pb2_grpc
 
 from functools import partial
 
@@ -79,6 +79,26 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
+    "--local",
+    dest="dev",
+    action="store_true",
+    default=False,
+    help="If added we connect via linkerd incoming router. \
+        This is connects to the service which is inside minikube "
+)
+
+parser.add_argument(
+    "--local-workflow-2",
+    dest="dev_workflow_2",
+    action="store_true",
+    default=False,
+    help="If added we connect via linkerd dev-workflow-2 router. \
+        To statically connect to a local running docker container."
+)
+
+
+
+parser.add_argument(
     "--dev-workflow-2",
     dest="dev_workflow_2",
     action="store_true",
@@ -93,6 +113,19 @@ parser.add_argument(
 #     default=False,
 #     help="If added we push a release to docker hub"
 # )
+parser.add_argument(
+    "--ip",
+    dest="ip_address",
+    action="store",
+    help="the version you want to release"
+)
+parser.add_argument(
+    "--port",
+    dest="port",
+    action="store",
+    help="the version you want to release"
+)
+
 
 args = parser.parse_args()
 
@@ -101,19 +134,24 @@ def run():
     if args.dev_workflow_2:
         print (green("====>> Building and Tagging Release:"))
         process = subprocess.Popen(
-            ["kubectl", "get", "svc", "linkerd", "-o", "jsonpath='{.spec.ports[?(@.name==\"incoming-dev-workflow-2\")].nodePort}'"],
+            ["kubectl", "get", "svc", "linkerd", "-o", "jsonpath='{.spec.ports[?(@.name==\"incoming\")].nodePort}'"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
         )
         PORT = str(process.communicate()[0]).strip("'")
         log.info("%s", PORT)
 
-    connection = '192.168.99.100:%s' % PORT
+    if args.ip_address:
+        ip_address = args.ip_address
+    else:
+        ip_address = '192.168.99.100'
+
+    connection = '%s:%s' % (ip_address, PORT)
 
     log.info("Going to connect: %s", connection)
 
     channel = grpc.insecure_channel(connection)
-    stub = hello_pb2_grpc.HelloStub(channel)
+    stub = globalapi_pb2_grpc.GlobalAPIStub(channel)
 
     log.debug("Sending an asynchronous request to %s", stub)
     response_future = stub.sayHello.future(hello_pb2.HelloRequest(name='async'),)

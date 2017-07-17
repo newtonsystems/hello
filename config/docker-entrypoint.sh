@@ -23,21 +23,21 @@ fi
 
 if [ "$1" = 'app' ]; then
 	echo -e "$INFO Running a $ENV_TYPE environment ... "
-	if [ "$ENV_TYPE" = 'dev' ]; then
-		echo -e "$INFO Copying any newly created wheelhouse packages over to /wheelhouse"
-		# Ok, we want to have the python packages cached when in 
-		# development via wheels:
-		# This is done by host volume mounting but as that 
-		# overlays the docker container folder we need to manually 
-		# copy at the entrypoint stage so that we are up to date
-		cp -r /tmp/wheelhouse /
+	echo -e "$INFO Copying any newly created wheelhouse packages over to /wheelhouse"
+	# Ok, we want to have the python packages cached when in 
+	# development via wheels:
+	# This is done by host volume mounting but as that 
+	# overlays the docker container folder we need to manually 
+	# copy at the entrypoint stage so that we are up to date
+	cp -r /tmp/wheelhouse /
 
+	if [ "$ENV_TYPE" = 'dev' ]; then
 		echo -e "$INFO Setting up a simple watcher using inotifywait ..."
 		while true
 		do
-        	run-app &
-        	inotifywait /usr/local/src/hello/app -e create -e modify
-        	pkill python
+			run-app &
+			inotifywait /usr/local/src/hello/app -e create -e modify
+			pkill python
 		done
 	elif [ "$ENV_TYPE" = 'prod' ]; then
 		run-app

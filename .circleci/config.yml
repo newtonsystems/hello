@@ -127,7 +127,7 @@ jobs:
             git submodule foreach git pull origin $CIRCLE_BRANCH
 
       - run: 
-          name: Build & Push to Docker Hub (branch and latest (sync'd to master)) 
+          name: Update kubernetes image - hello deployment
           command: |
             mkdir -p $HOME/.kube
             mv ~/dev-utils/config/k8s/kube.config $HOME/.kube/config

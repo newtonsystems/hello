@@ -6,6 +6,7 @@
 
 REPO=hello
 PROJECT_NAME=hello
+NEWTON_DIR=/Users/danvir/Masterbox/sideprojects/github/newtonsystems/
 
 TIMESTAMP=tmp-$(shell date +%s )
 
@@ -150,155 +151,6 @@ help-how-to:                 ##@other Shows some useful answers to frequent ques
 	@echo "\tYou can ignore the Prerequisites by setting FORCE_IGNORE_PREQ_TEST: make <command> FORCE_IGNORE_PREQ_TEST=true"
 	@echo ""
 
-#
-# Cleanup
-#
-.PHONY: kube-clean
-
-kube-clean:                       ##@cleanup Cleans Up Kubernetes Environment. Deletes all kubernetes components (services, pods, config, deployments ... etc)
-	kubectl delete deployment --all
-	kubectl delete daemonset --all
-	kubectl delete replicationcontroller --all
-	kubectl delete services --all
-	kubectl delete pods --all
-	kubectl delete configmap --all
-	-@eval $$(minikube docker-env); docker-rm-unnamed-images;
-
-
-#
-# Infrastructure
-#
-.PHONY: infra-recreate infra-create infra-delete
-
-ADMIN_PORT=`kubectl get svc linkerd -o jsonpath='{.spec.ports[?(@.name=="admin")].nodePort}'`
-NAMERD_PORT=`kubectl get svc namerd -o jsonpath='{.spec.ports[?(@.name=="http")].nodePort}'`
-PING_ADMIN=http://`minikube ip`:$(ADMIN_PORT)/admin/ping
-LINKERVIZ_PORT=`kubectl get svc linkerd-viz -o jsonpath='{.spec.ports[?(@.name=="grafana")].nodePort}'`
-NAMERCTL_BASE_URL = http://`minikube ip`:$(NAMERD_PORT)
-
-
-infra-set-environment:
-	@echo "Set up namerd env NAMERCTL_BASE_URL so you can use namerctl"
-	set NAMERCTL_BASE_URL="FSS"
-	@echo export NAMERCTL_BASE_URL=$(NAMERCTL_BASE_URL)
-
-
-infra-recreate:              ##@infrastructure Recreates all critical infrastructure components to run with your service (via minikube/k8s)
-	@echo "$(INFO) Re-creating Infrastructure Components"
-	make infra-delete
-	make infra-create
-
-infra-create:                ##@infrastructure Creates all critical infrastructure components (via minikube/k8s)
-	@echo "$(INFO) Creating Infrastructure Components"
-	kubectl apply -f ../devops/k8s/deploy/local/
-
-infra-delete:                ##@infrastructure Deletes all critical instructure components (via minikube/k8s)
-	@echo "$(INFO) Deleting Infrastructure Components"
-	kubectl delete -f ../devops/k8s/deploy/local/
-
-#
-# Infrastructure helper commands
-#
-.PHONY: infra-ui infra-linkerd-ping infra-linkerd-logs
-
-infra-ui:                    ##@infrastructure-helper-commands Open all infrastructure's UIs. Perfect for monitoring, debugging and tracing microservices.
-	@echo "$(INFO) Opening minikube dashboard (Kubernetes dashboard)"
-	@minikube dashboard
-	@echo "$(INFO) Opening linkerd 's admin page ..."
-	@minikube service linkerd --url | tail -n1 | xargs open
-	@echo "$(INFO) Opening linkerd viz ..."
-	@open http://`minikube ip`:$(LINKERVIZ_PORT)
-	@echo "$(INFO) Opening zipkin (distributed tracing)"
-	@minikube service zipkin
-	@echo "$(WARN) Not going to open minikube addon heapster. Heapster not currently working with minikube 0.19 (works with 0.18) (21/5/17)"
-# @echo "$(INFO) Opening Heapster - Resource Usage Analysis and Monitoring"
-# @open `minikube service monitoring-grafana --namespace=kube-system  --url`
-
-infra-linkerd-ping:          ##@infrastructure-helper-commands Pings linkerd's admin. A useful way to see if linkerd is up and running.
-	@printf "$(GREEN) Pinging Linkerd Admin Interface ... $(RESET)"
-	@if [ '$(shell curl $(PING_ADMIN))' != 'pong' ]; then \
-		echo "$(RED)Failed to receive a "'pong'" response. It looks like linkerd is not running...$(RESET)"; \
-		exit 1; \
-	else \
-		echo "$(GREEN)Successful ping.$(RESET)"; \
-	fi
-
-infra-linkerd-logs:     ##@infra-linkerd-logs Tails linkerd logs
-	@echo "$(INFO) Attaching to service $(BLUE)$(LINKERD_POD_NAME)$(RESET) logs"
-	kubectl logs -f --tail=50 $(LINKERD_POD_NAME) linkerd
-
-infra-namerd-logs:     ##@infra-namerd-logs Tails namerd logs
-	@echo "$(INFO) Attaching to service $(BLUE)$(NAMERD_POD_NAME)$(RESET) logs"
-	kubectl logs -f --tail=50 $(NAMERD_POD_NAME) namerd
-
-
-#
-# Build Service Locally + Deploy as a pod/service in minikube
-#
-.PHONY: kube-recreate kube-create kube-delete kube-update kube-mount
-
-POD_NAME=`kubectl get pods -o wide | grep $(PROJECT_NAME) | grep Running | cut -d ' ' -f1`
-LINKERD_POD_NAME=`kubectl get pods -o go-template='{{range .items}}{{if eq .status.phase "Running"}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | grep linkerd | grep -v linkerd-viz`
-NAMERD_POD_NAME=`kubectl get pods -o go-template='{{range .items}}{{if eq .status.phase "Running"}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | grep namerd`
-POD_PORT=`kubectl get svc $(PROJECT_NAME) -o jsonpath='{.spec.ports[?(@)].nodePort}'`
-
-
-kube-update:                                         ##@kube Updates service in minikube
-	@echo "$(INFO) Deploying $(REPO):$(TIMESTAMP) by replacing image in kubernetes deployment config"
-	@eval $$(minikube docker-env); docker image build -t $(REPO):$(TIMESTAMP) -f Dockerfile .
-	kubectl set image -f k8s/deploy/deployment.yaml $(PROJECT_NAME)=$(REPO):$(TIMESTAMP)
-
-kube-mount:                                          ##@kube Creates mounts for minikube
-	@echo "$(INFO) Setting up kubernetes mounts at $(BLUE).minikube-mounts/$(PROJECT_NAME)$(RESET)"
-	@mkdir -p .minikube-mounts/$(PROJECT_NAME)
-	@echo "$(WARN) Remember to add to k8s/deploy/deployment.yaml as well!"
-	@-ln -s \
-		${PWD}/app \
-		${PWD}/../libutils/libutils \
-	.minikube-mounts/$(PROJECT_NAME)
-	@echo "$(INFO) $(BLUE)Creating the following symlinks:$(RESET)"
-	@ls -ltra .minikube-mounts/$(PROJECT_NAME) | grep '\->'
-
-kube-create: kube-mount build                  ##@kube Create service and deploy to minikube
-	@echo "$(INFO) Building docker image: $(BLUE)hello:local$(RESET) and deploying to minikube."
-	kubectl create -f k8s/deploy/
-	
-	@echo "$(INFO) Wait for service to be ready"
-	./wait-for-it.sh -h `minikube ip` -p $(POD_PORT) -t 10
-	
-	@echo "$(INFO) Attaching to service logs"
-	@make kube-logs
-
-kube-delete:                                         ##@kube Delete service from minikube cluster
-	@echo "$(INFO) Deleting Service Components from minikube"
-	kubectl delete -f k8s/deploy/
-	@rm -rf .minikube-mounts/$(PROJECT_NAME)
-
-kube-recreate: kube-delete kube-create   ##@kube Recreate service in minikube
-	@echo "$(INFO) Recreating Service Components in minikube"
-
-
-#
-# Kube local helper commands (great for debugging / development)
-#
-.PHONY: kube-logs kube-env kube-attach kube-six-hour-logs
-
-kube-logs:                   ##@kube-debug Tails logs for the container
-	@echo "$(INFO) Attaching to pod $(BLUE)$(POD_NAME)$(RESET) logs"
-	@kubectl logs -f --tail=50 $(POD_NAME)
-
-kube-env:                    ##@kube-debug Prints environment variables for the container 
-	@echo "$(INFO) Printing the environment variables for $(BLUE)$(POD_NAME)$(RESET)"
-	@kubectl exec $(POD_NAME) printenv
-
-kube-attach:                 ##@kube-debug Attachs to the container with a shell
-	@echo "$(INFO) Attaching a shell to $(BLUE)$(POD_NAME)$(RESET)"
-	kubectl exec -it $(POD_NAME) -- /bin/bash
-
-kube-six-hour-logs:          ##@kube-debug Last six hours worth of logs for $(PROJECT_NAME)
-	@echo "$(INFO) $(BLUE)$(POD_NAME)$(RESET) logs for the last $(BLUE)six$(RESET) hours"
-	@kubectl logs --since=6h $(POD_NAME)
-
 
 #
 # Build Service Locally + Run locally
@@ -316,10 +168,12 @@ DOCKER_RUN_COMMAND=docker run \
 DOCKER_RUN_LOCAL_COMMAND=docker run -it  \
 	-p 50000:50000 \
 	-e "L5D_PORT_4141_TCP=$(LINKERD_SERVICE_PORT)" \
+	-v ${PWD}/wheelhouse:/wheelhouse \
+	-v ${PWD}/app:/usr/local/src/hello/app
 	#--name $(REPO)_local \
-	-v ${PWD}/app:/usr/local/src/hello/app #\
+	#\
 	#-v ${PWD}../../libutils:/usr/local/src/libutils \
-	#-v ${PWD}./wheelhouse:/wheelhouse
+	
 
 
 run-latest-release:          ##@local Run the current release (When you want to run as service as a black-box)
@@ -328,7 +182,6 @@ run-latest-release:          ##@local Run the current release (When you want to 
 	docker pull newtonsystems/hello:$(CURRENT_RELEASE_VERSION);
 	$(DOCKER_RUN_COMMAND) newtonsystems/$(REPO):$(CURRENT_RELEASE_VERSION) app;
 	@echo "$(NO_COLOR)"
-
 
 run-latest:                  ##@local Run the most up-to-date image for your branch from the docker registry or if the image doesnt exist yet you can specify. (When you want to run as service as a black-box)
 	@echo "$(INFO) Running the most up-to-date image"
@@ -342,12 +195,82 @@ run-latest:                  ##@local Run the most up-to-date image for your bra
 		$(DOCKER_RUN_COMMAND) newtonsystems/$(REPO):master app; \
 	fi
 
-## Development Workflow 2 (See above for information or make help-show-normal-usage)
+
+
+#
+# Run locally
+#
+build:                       ##@local Builds the local Dockerfile
+	mkdir -p wheelhouse 
+	@echo "$(INFO) Building the 'dev' Container locally with tag: $(REPO):local"
+	docker image build --build-arg APP_ENV=prod --build-arg PYPI_INDEX=$(CURRENT_BRANCH) -t $(REPO):local -f Dockerfile .
+	@echo ""
+
 run: build                   ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off. ##@local (dev-workflow-2) Runs docker container on same network as minikube making it accessible from kubernetes minikube and other kubernetes services
 	@echo "$(INFO) Running docker container with tag: $(REPO):local"
 	@echo "$(BLUE)"
 	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
 	@echo "$(NO_COLOR)"
+
+#
+# Hot reloaded run locally
+#
+build-dev:                       ##@local Builds the local Dockerfile
+	mkdir -p wheelhouse 
+	@echo "$(INFO) Building the 'dev' Container locally with tag: $(REPO):local"
+	docker image build --build-arg APP_ENV=dev --build-arg PYPI_INDEX=$(CURRENT_BRANCH) -t $(REPO):local -f Dockerfile .
+	@echo ""
+
+run-dev: build-dev                   ##@local Builds and run docker container with tag: '$(REPO):local' as a one-off. ##@local (dev-workflow-2) Runs docker container on same network as minikube making it accessible from kubernetes minikube and other kubernetes services
+	@echo "$(INFO) Running docker container with tag: $(REPO):local"
+	@echo "$(BLUE)"
+	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
+	@echo "$(NO_COLOR)"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Development Workflow 2 (See above for information or make help-show-normal-usage)
+
+
+
+
+
+
+
+
+
 
 daemon: build                ##@local Builds and run docker container with tag: '$(REPO):local' as a daemon
 	@echo "$(INFO) Running docker container with tag: $(REPO):local as a daemon ..."
@@ -363,11 +286,7 @@ run-dm: build-dm             ##@local Builds and run docker container with tag: 
 	@eval $$(minikube docker-env); $(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local app
 	@echo "$(NO_COLOR)"
 
-build:                       ##@local Builds the local Dockerfile
-	mkdir -p wheelhouse 
-	@echo "$(INFO) Building the 'dev' Container locally with tag: $(REPO):local"
-	docker image build --build-arg APP_ENV=dev --build-arg PYPI_INDEX=$(CURRENT_BRANCH) -t $(REPO):local -f Dockerfile .
-	@echo ""
+
 
 build-debug:                   ##@local Builds the local Dockerfile.dev (Development Dockerfile (Not run in production)). Useful if you need to debug a container (Installs helpful tools)
 	mkdir -p wheelhouse 
@@ -429,10 +348,6 @@ check: build                 ##@local-test Run regression tests against the dock
 	@echo "$(INFO) Running some tests inside the container"
 	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local run_tests.sh
 
-circleci-check: build        ##@local-test Run regression tests against the dockerized service for circleci
-	@echo "$(INFO) Running some tests inside the container"
-	$(DOCKER_RUN_COMMAND) -e "CODECLIMATE_REPO_TOKEN=${CODECLIMATE_REPO_TOKEN}" $(REPO):local run_tests.sh --code-climate
-
 lint: build                  ##@local-test Run lint tests against the dockerized service 
 	@echo "$(INFO) Running lint tests against the docker container"
 	$(DOCKER_RUN_LOCAL_COMMAND) $(REPO):local pylint -r y --output-format=colorized --load-plugins=pylint.extensions.check_docs app
@@ -452,6 +367,37 @@ nghttpx:
 	nghttpx 
 	#--frontend=$(MAC_IP_ADDR),50000
 
+
+#
+# Minikube
+#
+POD_NAME=`kubectl get pods -o wide | grep $(PROJECT_NAME) | grep Running | cut -d ' ' -f1`
+
+PHONY: mkube-update mkube-logs mkube-env mkube-attach mkube-six-hour-logsk
+
+mkube-update:           ##@kube Updates service in minikube
+	@echo "$(INFO) Deploying $(REPO):$(TIMESTAMP) by replacing image in minikube kubernetes deployment config"
+	# TODO: add cluster check  - i.e. is minikube pointed at
+	@eval $$(minikube docker-env); docker image build -t $(REPO):$(TIMESTAMP) -f Dockerfile .
+	kubectl set image -f $(NEWTON_DIR)/devops/k8s/deploy/local/hello-deployment.yml hello=$(REPO):$(TIMESTAMP)
+
+mkube-logs:                   ##@kube-debug Tails logs for the container
+	@echo "$(INFO) Attaching to pod $(BLUE)$(POD_NAME)$(RESET) logs"
+	@kubectl logs -f --tail=50 $(POD_NAME)
+
+mkube-env:                    ##@kube-debug Prints environment variables for the container 
+	@echo "$(INFO) Printing the environment variables for $(BLUE)$(POD_NAME)$(RESET)"
+	@kubectl exec $(POD_NAME) printenv
+
+mkube-attach:                 ##@kube-debug Attachs to the container with a shell
+	@echo "$(INFO) Attaching a shell to $(BLUE)$(POD_NAME)$(RESET)"
+	kubectl exec -it $(POD_NAME) -- /bin/bash
+
+mkube-six-hour-logs:          ##@kube-debug Last six hours worth of logs for $(PROJECT_NAME)
+	@echo "$(INFO) $(BLUE)$(POD_NAME)$(RESET) logs for the last $(BLUE)six$(RESET) hours"
+	@kubectl logs --since=6h $(POD_NAME)
+
+
 #
 # Deploy (in-staging testing)
 #
@@ -459,5 +405,6 @@ nghttpx:
 deploy-cloud-dev:                ##@local-deploy Deploy service to cloud environment (for in staging testing)
 	@echo "Not implemented yet ... sorry boss"
 	kubectl config set-context dev 
+	kubectl config set-cluster dev
 	kubectl sjkjfdsjflkds
 	kubectl config set-context minikube
