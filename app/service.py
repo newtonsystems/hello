@@ -34,10 +34,23 @@ class Helloer(hello_pb2_grpc.HelloServicer):
             Returns:
                 hello_pb2.HelloReply: Description of return value
         """
-        log.info("Saying Hello hot-reloaded for name: %s", request.name)
-        #message = str(world.sayWorld(request.name))
-        message = request.name + '  hot-reloaded'
-        return hello_pb2.HelloReply(message=message)
+        log.info("Saying Hello for name: %s", request.name)
+        message = request.name
+        return hello_pb2.HelloResponse(message=message)
+
+    def sayHelloWorld(self, request, context):
+        """ Say Hello World to user name.
+
+            Args:
+                request (int): Description of arg1
+                context (str): Description of arg2
+
+            Returns:
+                hello_pb2.HelloReply: Description of return value
+        """
+        log.info("Saying Hello World for name: %s", request.name)
+        message = str(world.sayWorld(request.name))
+        return hello_pb2.HelloResponse(message=message)
 
 
 def serve():
